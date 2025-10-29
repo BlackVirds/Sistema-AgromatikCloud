@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/agromatik_db?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/agromatik_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true #Despues de la actualizacion de InteliJ me pidió otro parametro para conectarse a la BD "allowPublicKeyRetrieval"
     username: root
     password: $@lano12
     driver-class-name: com.mysql.cj.jdbc.Driver
