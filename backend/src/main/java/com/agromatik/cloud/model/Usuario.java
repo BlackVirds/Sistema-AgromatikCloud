@@ -6,8 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor //Genera un constructor vacío: public Usuario() {}. para crear objetos Usuario cuando los saca de la base de datos
 @AllArgsConstructor //Genera un constructor que incluye todos los campos: public Usuario(Long id, String uuid, String email, ...)
 @Builder
+@DynamicInsert
 public class Usuario {
 
     @Id
@@ -36,7 +38,10 @@ public class Usuario {
     @Column(nullable = false, length = 100)
     private String nombre;
 
+    @Column(length = 100)
     private String apellido;
+
+    @Column(length = 20)
     private String telefono;
 
     @Enumerated(EnumType.STRING)
@@ -44,10 +49,14 @@ public class Usuario {
     private TipoUsuario tipo;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="suscription_plan")
+    @Column(name="subscription_plan")
     private PlanSuscripcion suscriptionPlan = PlanSuscripcion.BASICO;
 
-    private LocalDate fechaRegistro = LocalDate.now();
+    @CreationTimestamp
+    @Column(name = "fecha_registro", updatable = false)
+    private LocalDateTime fechaRegistro;
+
+    @Column(name = "ultimo_login")
     private LocalDateTime ultimoLogin;
 
     private Boolean activo = true;

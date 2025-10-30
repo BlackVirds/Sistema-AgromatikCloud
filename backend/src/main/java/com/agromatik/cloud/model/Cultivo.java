@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@DynamicInsert
 public class Cultivo {
 
     @Id
@@ -25,35 +27,50 @@ public class Cultivo {
     @Column(unique = true, nullable = false, length=36)
     private String uuid = UUID.randomUUID().toString();
 
-    @Column(nullable = false, length = 100)
-    private String nombre;
+    @Column(name = "tipo_cultivo", nullable = false, length = 100)
+    private String tipoCultivo;
 
-    private String tipo;
+    @Column(length = 100)
     private String variedad;
 
-    @Column(name="fecha_siembra")
+    @Column(name="fecha_siembra", nullable = false)
     private LocalDate fechaSiembra;
 
     @Column(name = "fecha_cosecha_estimada")
     private LocalDate fechaCosechaEstimada;
 
-    @Column(name = "superficie_hectareas", precision = 10, scale = 2)
-    private BigDecimal superficieHectareas;
+    @Column(name = "fecha_cosecha_real")
+    private LocalDate fechaCosechaReal;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(name = "estado")
     private EstadoCultivo estado = EstadoCultivo.ACTIVO;
+
+    @Column(name = "densidad_siembra", precision = 8, scale = 2)
+    private BigDecimal densidadSiembra;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "metodo_riego")
+    private MetodoRiego metodoRiego;
+
+    @Column(columnDefinition = "text")
+    private String notas;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "huerta_id", nullable = false)
     private Huerta huerta;
 
-    @Column(name="fecha_creacion")
-    private LocalDate fechaCreacion = LocalDate.now();
-
-    private Boolean activo=true;
-
     public enum EstadoCultivo {
-        ACTIVO, FINALIZADO, EN_ESPERA
+        PLANIFICADO,
+        ACTIVO,
+        COSECHADO,
+        CANCELADO
+    }
+
+    public enum MetodoRiego {
+        GOTEO,
+        ASPERSION,
+        INUNDACION,
+        OTROS
     }
 }

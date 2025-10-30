@@ -25,14 +25,29 @@ public class UsuarioService {
 
     public Optional<Usuario> update(String uuid, Usuario datosActualizados) {
         return usuarioRepository.findByUuid(uuid).map(usuarioExistente -> {
-            // Solo actualizamos campos modificables
-            usuarioExistente.setNombre(datosActualizados.getNombre());
-            usuarioExistente.setApellido(datosActualizados.getApellido());
-            usuarioExistente.setTelefono(datosActualizados.getTelefono());
-            usuarioExistente.setTipo(datosActualizados.getTipo());
-            usuarioExistente.setSuscriptionPlan(datosActualizados.getSuscriptionPlan());
-            usuarioExistente.setActivo(datosActualizados.getActivo());
-            usuarioExistente.setConfiguraciones(datosActualizados.getConfiguraciones());
+
+            if (datosActualizados.getNombre() != null) {
+                usuarioExistente.setNombre(datosActualizados.getNombre());
+            }
+            if (datosActualizados.getApellido() != null) {
+                usuarioExistente.setApellido(datosActualizados.getApellido());
+            }
+            if (datosActualizados.getTelefono() != null) {
+                usuarioExistente.setTelefono(datosActualizados.getTelefono());
+            }
+            if (datosActualizados.getTipo() != null) {
+                usuarioExistente.setTipo(datosActualizados.getTipo());
+            }
+            if (datosActualizados.getSuscriptionPlan() != null) {
+                usuarioExistente.setSuscriptionPlan(datosActualizados.getSuscriptionPlan());
+            }
+            if (datosActualizados.getActivo() != null) {
+                usuarioExistente.setActivo(datosActualizados.getActivo());
+            }
+            if (datosActualizados.getConfiguraciones() != null) {
+                usuarioExistente.setConfiguraciones(datosActualizados.getConfiguraciones());
+            }
+
             return usuarioRepository.save(usuarioExistente);
         });
     }

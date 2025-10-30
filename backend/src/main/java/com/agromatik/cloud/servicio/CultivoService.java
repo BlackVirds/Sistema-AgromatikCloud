@@ -33,21 +33,37 @@ public class CultivoService {
 
     public Optional<Cultivo> updateByUuid(String uuid, Cultivo updated) {
         return cultivoRepository.findByUuid(uuid).map(existing -> {
-            // Actualiza solo si el nuevo valor no es null (evita sobrescribir con null)
-            if (updated.getNombre() != null) existing.setNombre(updated.getNombre());
-            if (updated.getTipo() != null) existing.setTipo(updated.getTipo());
-            if (updated.getVariedad() != null) existing.setVariedad(updated.getVariedad());
-            if (updated.getFechaSiembra() != null) existing.setFechaSiembra(updated.getFechaSiembra());
-            if (updated.getFechaCosechaEstimada() != null) existing.setFechaCosechaEstimada(updated.getFechaCosechaEstimada());
-            if (updated.getSuperficieHectareas() != null) existing.setSuperficieHectareas(updated.getSuperficieHectareas());
-            if (updated.getEstado() != null) existing.setEstado(updated.getEstado());
-            if (updated.getActivo() != null) existing.setActivo(updated.getActivo());
 
-            // Si en el body viene huerta con id, validar que exista y reasignar
+            if (updated.getTipoCultivo() != null) {
+                existing.setTipoCultivo(updated.getTipoCultivo());
+            }
+            if (updated.getFechaCosechaReal() != null) {
+                existing.setFechaCosechaReal(updated.getFechaCosechaReal());
+            }
+            if (updated.getDensidadSiembra() != null) {
+                existing.setDensidadSiembra(updated.getDensidadSiembra());
+            }
+            if (updated.getMetodoRiego() != null) {
+                existing.setMetodoRiego(updated.getMetodoRiego());
+            }
+            if (updated.getNotas() != null) {
+                existing.setNotas(updated.getNotas());
+            }
+            if (updated.getVariedad() != null) {
+                existing.setVariedad(updated.getVariedad());
+            }
+            if (updated.getFechaSiembra() != null) {
+                existing.setFechaSiembra(updated.getFechaSiembra());
+            }
+            if (updated.getFechaCosechaEstimada() != null) {
+                existing.setFechaCosechaEstimada(updated.getFechaCosechaEstimada());
+            }
+            if (updated.getEstado() != null) {
+                existing.setEstado(updated.getEstado());
+            }
             if (updated.getHuerta() != null && updated.getHuerta().getId() != null) {
                 huertaRepository.findById(updated.getHuerta().getId()).ifPresent(existing::setHuerta);
             }
-
             return cultivoRepository.save(existing);
         });
     }

@@ -35,20 +35,37 @@ public class SensorService {
     public Optional<Sensor> updateSensor(String uuid, Sensor updatedSensor) {
         return sensorRepository.findByUuid(uuid).map(sensor -> {
 
-            if (updatedSensor.getTipo() != null) {
-                sensor.setTipo(updatedSensor.getTipo());
+
+            if (updatedSensor.getNombre() != null) {
+                sensor.setNombre(updatedSensor.getNombre());
             }
+            if (updatedSensor.getTipoSensor() != null) {
+                sensor.setTipoSensor(updatedSensor.getTipoSensor());
+            }
+            if (updatedSensor.getFabricante() != null) {
+                sensor.setFabricante(updatedSensor.getFabricante());
+            }
+            if (updatedSensor.getUbicacionGeografica() != null) {
+                sensor.setUbicacionGeografica(updatedSensor.getUbicacionGeografica());
+            }
+            if (updatedSensor.getFechaInstalacion() != null) {
+                sensor.setFechaInstalacion(updatedSensor.getFechaInstalacion());
+            }
+            if (updatedSensor.getUltimoMantenimiento() != null) {
+                sensor.setUltimoMantenimiento(updatedSensor.getUltimoMantenimiento());
+            }
+            if (updatedSensor.getEstado() != null) {
+                sensor.setEstado(updatedSensor.getEstado());
+            }
+            if (updatedSensor.getBateriaNivel() != null) {
+                sensor.setBateriaNivel(updatedSensor.getBateriaNivel());
+            }
+            if (updatedSensor.getConfiguraciones() != null) {
+                sensor.setConfiguraciones(updatedSensor.getConfiguraciones());
+            }
+
             if (updatedSensor.getModelo() != null) {
                 sensor.setModelo(updatedSensor.getModelo());
-            }
-            if (updatedSensor.getDescripcion() != null) {
-                sensor.setDescripcion(updatedSensor.getDescripcion());
-            }
-            if (updatedSensor.getUbicacion() != null) {
-                sensor.setUbicacion(updatedSensor.getUbicacion());
-            }
-            if (updatedSensor.getActivo() != null) {
-                sensor.setActivo(updatedSensor.getActivo());
             }
             if (updatedSensor.getHuerta() != null) {
                 sensor.setHuerta(updatedSensor.getHuerta());

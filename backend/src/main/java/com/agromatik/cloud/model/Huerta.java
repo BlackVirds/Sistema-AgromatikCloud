@@ -1,11 +1,14 @@
 package com.agromatik.cloud.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.locationtech.jts.geom.Point;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,6 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@DynamicInsert
 public class Huerta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,8 +33,15 @@ public class Huerta {
     private String nombre;
 
     private String descripcion;
+    @Column(name = "ubicacion_geografica", columnDefinition = "point")
+    private Point ubicacionGeografica;
+
     private String direccion;
+
+    @Column(length = 100)
     private String municipio;
+
+    @Column(length = 100)
     private String estado;
 
     @Column(nullable = false, length = 50)
@@ -51,8 +62,9 @@ public class Huerta {
     @JoinColumn(name="usuario_id", nullable=false)
     private Usuario usuario;
 
-    @Column(name="fecha_creacion")
-    private LocalDateTime fechaCreacion = LocalDateTime.now();
+    @CreationTimestamp
+    @Column(name="fecha_creacion", updatable = false)
+    private LocalDateTime fechaCreacion;
 
     private Boolean activa = true;
 

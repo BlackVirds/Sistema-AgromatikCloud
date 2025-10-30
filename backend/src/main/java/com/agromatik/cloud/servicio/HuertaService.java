@@ -40,16 +40,41 @@ public class HuertaService {
 
     public Optional<Huerta> updateByUuid(String uuid, Huerta updatedHuerta) {
         return huertaRepository.findByUuid(uuid).map(existing -> {
-            existing.setNombre(updatedHuerta.getNombre());
-            existing.setDescripcion(updatedHuerta.getDescripcion());
-            existing.setDireccion(updatedHuerta.getDireccion());
-            existing.setMunicipio(updatedHuerta.getMunicipio());
-            existing.setEstado(updatedHuerta.getEstado());
-            existing.setPais(updatedHuerta.getPais());
-            existing.setTamañoHectareas(updatedHuerta.getTamañoHectareas());
-            existing.setTipoSuelo(updatedHuerta.getTipoSuelo());
-            existing.setAltitudMetros(updatedHuerta.getAltitudMetros());
-            existing.setActiva(updatedHuerta.getActiva());
+
+            if (updatedHuerta.getNombre() != null) {
+                existing.setNombre(updatedHuerta.getNombre());
+            }
+            if (updatedHuerta.getDescripcion() != null) {
+                existing.setDescripcion(updatedHuerta.getDescripcion());
+            }
+            if (updatedHuerta.getUbicacionGeografica() != null) {
+                existing.setUbicacionGeografica(updatedHuerta.getUbicacionGeografica());
+            }
+            if (updatedHuerta.getDireccion() != null) {
+                existing.setDireccion(updatedHuerta.getDireccion());
+            }
+            if (updatedHuerta.getMunicipio() != null) {
+                existing.setMunicipio(updatedHuerta.getMunicipio());
+            }
+            if (updatedHuerta.getEstado() != null) {
+                existing.setEstado(updatedHuerta.getEstado());
+            }
+            if (updatedHuerta.getPais() != null) {
+                existing.setPais(updatedHuerta.getPais());
+            }
+            if (updatedHuerta.getTamañoHectareas() != null) {
+                existing.setTamañoHectareas(updatedHuerta.getTamañoHectareas());
+            }
+            if (updatedHuerta.getTipoSuelo() != null) {
+                existing.setTipoSuelo(updatedHuerta.getTipoSuelo());
+            }
+            if (updatedHuerta.getAltitudMetros() != null) {
+                existing.setAltitudMetros(updatedHuerta.getAltitudMetros());
+            }
+            if (updatedHuerta.getActiva() != null) {
+                existing.setActiva(updatedHuerta.getActiva());
+            }
+
             return huertaRepository.save(existing);
         });
     }
