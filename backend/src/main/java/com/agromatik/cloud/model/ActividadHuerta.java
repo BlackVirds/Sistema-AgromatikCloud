@@ -3,6 +3,7 @@ package com.agromatik.cloud.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class ActividadHuerta {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="huerta_id", nullable = false)
+    @NotNull(message = "La huerta es obligatoria")
     private Huerta huerta;
 
     @ManyToOne(fetch = FetchType.LAZY)

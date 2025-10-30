@@ -2,6 +2,7 @@ package com.agromatik.cloud.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +11,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.locationtech.jts.geom.Point;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -54,15 +54,16 @@ public class Sensor {
     @Column(name = "estado")
     private EstadoSensor estado = EstadoSensor.activo;
 
-    @Column(name = "bateria_nivel") // Nuevo campo
+    @Column(name = "bateria_nivel")
     private Integer bateriaNivel;
 
-    @Column(columnDefinition = "json") // Nuevo campo
-    private String configuraciones; // Mapeado a String por simplicidad
+    @Column(columnDefinition = "json")
+    private String configuraciones;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="huerta_id", nullable=false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @NotNull(message = "La huerta es obligatoria para crear un sensor")
     private Huerta huerta;
 
     public enum TipoSensor {

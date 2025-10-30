@@ -2,6 +2,8 @@ package com.agromatik.cloud.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,9 +32,11 @@ public class Usuario {
     private String uuid = UUID.randomUUID().toString();
 
     @Column(unique = true, nullable = false, length=255)
+    @Email(message = "El formato del email no es válido")
     private String email;
 
     @Column(name = "password_hash", nullable = false, length=255)
+    @NotBlank(message = "La contraseña es obligatoria")
     private String passwordHash;
 
     @Column(nullable = false, length = 100)

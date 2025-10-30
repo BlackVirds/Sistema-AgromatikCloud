@@ -1,8 +1,10 @@
 package com.agromatik.cloud.servicio;
 
 import com.agromatik.cloud.model.Cultivo;
+import com.agromatik.cloud.model.Huerta;
 import com.agromatik.cloud.repository.CultivoRepository;
 import com.agromatik.cloud.repository.HuertaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -69,10 +71,22 @@ public class CultivoService {
     }
 
     public Cultivo save(Cultivo cultivo){
+
+        Long huertaId = cultivo.getHuerta().getId();
+        if (huertaId == null) {
+            throw new IllegalArgumentException("El ID de la huerta es obligatorio para crear un cultivo.");
+        }
+
+        Huerta huertaExistente = huertaRepository.findById(huertaId)
+                .orElseThrow(() -> new EntityNotFoundException("No se encontró la huerta con ID: " + huertaId));
+
+        cultivo.setHuerta(huertaExistente);
         return cultivoRepository.save(cultivo);
     }
-
-    public void deleteByUuid(String uuid){
-        cultivoRepository.findByUuid(uuid).ifPresent(cultivoRepository::delete);
+    public boolean deleteByUuid(String uuid) {
+        return cultivoRepository.findByUuid(uuid).map(cultivo -> {
+            cultivoRepository.delete(cultivo);
+            return true;
+        }).orElse(false);
     }
 }

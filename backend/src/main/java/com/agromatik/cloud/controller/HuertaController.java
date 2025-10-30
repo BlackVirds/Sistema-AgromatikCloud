@@ -2,6 +2,7 @@ package com.agromatik.cloud.controller;
 
 import com.agromatik.cloud.model.Huerta;
 import com.agromatik.cloud.servicio.HuertaService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

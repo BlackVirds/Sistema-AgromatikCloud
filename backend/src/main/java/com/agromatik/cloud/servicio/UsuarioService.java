@@ -2,6 +2,7 @@ package com.agromatik.cloud.servicio;
 
 import com.agromatik.cloud.model.Usuario;
 import com.agromatik.cloud.repository.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,9 +11,11 @@ import java.util.Optional;
 @Service
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioReporsitory){
-        this.usuarioRepository=usuarioReporsitory;
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public List<Usuario> getAll(){
@@ -53,6 +56,18 @@ public class UsuarioService {
     }
 
     public Usuario save(Usuario usuario){
+        usuarioRepository.findByEmail(usuario.getEmail()).ifPresent(u -> {
+            throw new IllegalStateException("El email " + usuario.getEmail() + " ya está registrado.");
+        });
+        // Obtenemos la contraseña en texto plano que envió el usuario
+        String plainPassword = usuario.getPasswordHash();
+
+        // La 'hasheamos'
+        String hashedPassword = passwordEncoder.encode(plainPassword);
+
+        // Reemplazamos el texto plano por el hash
+        usuario.setPasswordHash(hashedPassword);
+
         return usuarioRepository.save(usuario);
     }
 

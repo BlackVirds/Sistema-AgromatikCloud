@@ -1,7 +1,10 @@
 package com.agromatik.cloud.servicio;
 
+import com.agromatik.cloud.model.Huerta;
 import com.agromatik.cloud.model.Sensor;
+import com.agromatik.cloud.repository.HuertaRepository;
 import com.agromatik.cloud.repository.SensorRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +14,11 @@ import java.util.Optional;
 public class SensorService {
 
     private final SensorRepository sensorRepository;
+    private final HuertaRepository huertaRepository;
 
-    public SensorService(SensorRepository sensorRepository) {
+    public SensorService(SensorRepository sensorRepository,  HuertaRepository huertaRepository) {
         this.sensorRepository = sensorRepository;
+        this.huertaRepository = huertaRepository;
     }
 
     public List<Sensor> getAll(){
@@ -29,6 +34,16 @@ public class SensorService {
     }
 
     public Sensor save(Sensor sensor){
+
+        Long huertaId = sensor.getHuerta().getId();
+        if (huertaId == null) {
+            throw new IllegalArgumentException("El ID de la huerta es obligatorio para crear un sensor.");
+        }
+
+        Huerta huertaExistente = huertaRepository.findById(huertaId)
+                .orElseThrow(() -> new EntityNotFoundException("No se encontró la huerta con ID: " + huertaId));
+
+        sensor.setHuerta(huertaExistente);
         return sensorRepository.save(sensor);
     }
 
@@ -67,15 +82,26 @@ public class SensorService {
             if (updatedSensor.getModelo() != null) {
                 sensor.setModelo(updatedSensor.getModelo());
             }
-            if (updatedSensor.getHuerta() != null) {
-                sensor.setHuerta(updatedSensor.getHuerta());
+            if (updatedSensor.getHuerta() != null && updatedSensor.getHuerta().getId() != null) {
+                Long nuevaHuertaId = updatedSensor.getHuerta().getId();
+
+                Huerta huertaExistente = huertaRepository.findById(nuevaHuertaId)
+                        .orElseThrow(() -> new EntityNotFoundException("No se encontró la huerta con ID: " + nuevaHuertaId));
+
+                sensor.setHuerta(huertaExistente);
+
+            } else if (updatedSensor.getHuerta() != null) {
+                throw new IllegalArgumentException("Se intentó actualizar la huerta pero no se proporcionó un ID de huerta.");
             }
 
             return sensorRepository.save(sensor);
         });
     }
 
-    public void delete(String uuid){
-        sensorRepository.findByUuid(uuid).ifPresent(sensorRepository::delete);
+    public boolean delete(String uuid) {
+        return sensorRepository.findByUuid(uuid).map(sensor -> {
+            sensorRepository.delete(sensor);
+            return true;
+        }).orElse(false);
     }
 }

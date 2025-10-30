@@ -2,6 +2,7 @@ package com.agromatik.cloud.controller;
 
 import com.agromatik.cloud.model.Cultivo;
 import com.agromatik.cloud.servicio.CultivoService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,11 +52,14 @@ public class CultivoController {
     }
 
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<Void> deleteCultivo(@PathVariable String uuid){
-        cultivoService.deleteByUuid(uuid);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteCultivo(@PathVariable String uuid) {
+        boolean eliminado = cultivoService.deleteByUuid(uuid);
+
+        if (eliminado) {
+            return ResponseEntity.noContent().build(); // 204: Éxito, se borró
+        } else {
+            return ResponseEntity.notFound().build(); // 404: No se encontró
+        }
     }
-
-
 
 }

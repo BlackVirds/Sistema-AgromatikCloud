@@ -1,7 +1,10 @@
 package com.agromatik.cloud.servicio;
 
 import com.agromatik.cloud.model.Huerta;
+import com.agromatik.cloud.model.Usuario;
 import com.agromatik.cloud.repository.HuertaRepository;
+import com.agromatik.cloud.repository.UsuarioRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,9 +13,12 @@ import java.util.Optional;
 @Service
 public class HuertaService {
     private final HuertaRepository huertaRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    public HuertaService(HuertaRepository huertaRepository) {
+    public HuertaService(HuertaRepository huertaRepository, UsuarioRepository usuarioRepository) {
+
         this.huertaRepository = huertaRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public List<Huerta> getAll() {
@@ -28,6 +34,21 @@ public class HuertaService {
     }
 
     public Huerta save(Huerta huerta) {
+
+        Long usuarioId = huerta.getUsuario().getId();
+
+        if (usuarioId == null) {
+            throw new IllegalArgumentException("El ID del usuario es obligatorio para crear una huerta.");
+        }
+
+        // Buscamos al usuario en la BD
+        Usuario usuarioExistente = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new EntityNotFoundException("No se encontró el usuario con ID: " + usuarioId));
+
+        //Si existe, adjuntamos el objeto Usuario real a la huerta
+        huerta.setUsuario(usuarioExistente);
+
+        //guardamos
         return huertaRepository.save(huerta);
     }
 

@@ -1,6 +1,7 @@
 package com.agromatik.cloud.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -58,6 +59,7 @@ public class Cultivo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "huerta_id", nullable = false)
+    @NotNull(message = "La huerta es obligatoria para crear un cultivo")
     private Huerta huerta;
 
     public enum EstadoCultivo {

@@ -3,6 +3,7 @@ package com.agromatik.cloud.controller;
 import com.agromatik.cloud.model.Sensor;
 import com.agromatik.cloud.repository.SensorRepository;
 import com.agromatik.cloud.servicio.SensorService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,13 +43,18 @@ public class SensorController {
     }
 
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<Void> deleteSensor(@PathVariable String uuid){
-        sensorService.delete(uuid);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteSensor(@PathVariable String uuid) {
+        boolean eliminado = sensorService.delete(uuid);
+
+        if (eliminado) {
+            return ResponseEntity.noContent().build(); // 204: Éxito, se borró
+        } else {
+            return ResponseEntity.notFound().build(); // 404: No se encontró
+        }
     }
 
     @PutMapping("/{uuid}")
-    public ResponseEntity<Sensor> updateSensor(@PathVariable String uuid, @RequestBody Sensor updatedSensor){
+    public ResponseEntity<Sensor> updateSensor(@PathVariable String uuid,@RequestBody Sensor updatedSensor){
         return sensorService.updateSensor(uuid, updatedSensor)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
