@@ -6,6 +6,8 @@ import com.agromatik.cloud.repository.HuertaRepository;
 import com.agromatik.cloud.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import static com.agromatik.cloud.util.ValidacionesUtil.validarUbicacion;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +43,11 @@ public class HuertaService {
             throw new IllegalArgumentException("El ID del usuario es obligatorio para crear una huerta.");
         }
 
+        // 🔹 Validar ubicación geográfica solo si no está vacía
+        if (huerta.getUbicacionGeografica() != null && !huerta.getUbicacionGeografica().isBlank()) {
+            validarUbicacion(huerta.getUbicacionGeografica());
+        }
+
         // Buscamos al usuario en la BD
         Usuario usuarioExistente = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new EntityNotFoundException("No se encontró el usuario con ID: " + usuarioId));
@@ -54,7 +61,18 @@ public class HuertaService {
 
     public boolean deleteByUuid(String uuid) {
         return huertaRepository.findByUuid(uuid).map(huerta -> {
-            huertaRepository.delete(huerta);
+
+            // Si la huerta ya está inactiva, salimos con éxito.
+            if (huerta.getActiva() == null || !huerta.getActiva()) {
+                return true;
+            }
+
+            // 1. Aplicamos el Soft Delete
+            huerta.setActiva(false);
+
+            // 2. Guardamos el cambio
+            huertaRepository.save(huerta);
+
             return true;
         }).orElse(false);
     }
@@ -68,8 +86,13 @@ public class HuertaService {
             if (updatedHuerta.getDescripcion() != null) {
                 existing.setDescripcion(updatedHuerta.getDescripcion());
             }
-            if (updatedHuerta.getUbicacionGeografica() != null) {
+            if (updatedHuerta.getUbicacionGeografica() != null && !updatedHuerta.getUbicacionGeografica().isBlank()) {
+                // 🔹 Valida solo si tiene valor real
+                validarUbicacion(updatedHuerta.getUbicacionGeografica());
                 existing.setUbicacionGeografica(updatedHuerta.getUbicacionGeografica());
+            } else if (updatedHuerta.getUbicacionGeografica() != null && updatedHuerta.getUbicacionGeografica().isBlank()) {
+                // 🔹 Si explícitamente mandan una cadena vacía, limpiamos el campo
+                existing.setUbicacionGeografica(null);
             }
             if (updatedHuerta.getDireccion() != null) {
                 existing.setDireccion(updatedHuerta.getDireccion());
@@ -99,4 +122,5 @@ public class HuertaService {
             return huertaRepository.save(existing);
         });
     }
+
 }

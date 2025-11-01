@@ -11,6 +11,7 @@ import com.agromatik.cloud.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -131,8 +132,25 @@ public class ActividadHuertaService {
     }
     public boolean deleteById(Long id) {
         return actividadHuertaRepository.findById(id).map(actividad -> {
-            actividadHuertaRepository.delete(actividad);
+
+            // 1. Opcional: Si ya está marcada como completada, no hacemos nada más
+            if (actividad.getCompletada() != null && actividad.getCompletada()) {
+                return true;
+            }
+
+            // 2. Aplicamos el Soft Delete/Finalización Lógica:
+            // Marcamos la actividad como COMPLETADA (true).
+            actividad.setCompletada(true);
+
+            // 3. Opcional: Si no tenía una fecha de actividad real, puedes registrar la actual
+            if (actividad.getFechaActividad() == null) {
+                actividad.setFechaActividad(LocalDateTime.now());
+            }
+
+            // 4. Guardamos el cambio (el registro se mantiene en la BD)
+            actividadHuertaRepository.save(actividad);
+
             return true;
-        }).orElse(false);
+        }).orElse(false); // Si no se encuentra el ID, devuelve false (404 Not Found)
     }
 }

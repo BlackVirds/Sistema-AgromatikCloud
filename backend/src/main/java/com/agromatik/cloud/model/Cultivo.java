@@ -1,6 +1,7 @@
 package com.agromatik.cloud.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Builder
 @DynamicInsert
 public class Cultivo {
@@ -60,6 +62,7 @@ public class Cultivo {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "huerta_id", nullable = false)
     @NotNull(message = "La huerta es obligatoria para crear un cultivo")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "cultivos"})
     private Huerta huerta;
 
     public enum EstadoCultivo {

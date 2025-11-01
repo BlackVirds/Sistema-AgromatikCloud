@@ -85,8 +85,20 @@ public class CultivoService {
     }
     public boolean deleteByUuid(String uuid) {
         return cultivoRepository.findByUuid(uuid).map(cultivo -> {
-            cultivoRepository.delete(cultivo);
+
+            // 1. Opcional: Impedir que se borre si ya está cosechado/cancelado
+            if (cultivo.getEstado() == Cultivo.EstadoCultivo.COSECHADO || cultivo.getEstado() == Cultivo.EstadoCultivo.CANCELADO) {
+                // Si ya terminó el ciclo, no hay nada que hacer, se considera "eliminado" lógicamente.
+                return true;
+            }
+
+            // 2. Aplicamos el Soft Delete: Marcamos el estado como CANCELADO
+            cultivo.setEstado(Cultivo.EstadoCultivo.CANCELADO);
+
+            // 3. Guardamos el cambio (el registro se mantiene)
+            cultivoRepository.save(cultivo);
+
             return true;
-        }).orElse(false);
+        }).orElse(false); // Si no se encuentra el UUID, devuelve false (404 Not Found)
     }
 }

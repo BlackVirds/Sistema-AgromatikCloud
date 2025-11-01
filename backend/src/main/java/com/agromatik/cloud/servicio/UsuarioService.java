@@ -73,8 +73,20 @@ public class UsuarioService {
 
     public boolean deleteByUuid(String uuid) {
         return usuarioRepository.findByUuid(uuid).map(usuario -> {
-            usuarioRepository.delete(usuario);
-            return true;
-        }).orElse(false);
+
+            // 1. Verificar si el usuario ya está inactivo (opcional)
+            if (usuario.getActivo() == null || !usuario.getActivo()) {
+                // Ya estaba inactivo, no hacemos nada más, pero confirmamos el éxito
+                return true;
+            }
+
+            // 2. Desactivación Lógica (Soft Delete)
+            usuario.setActivo(false); //  CAMBIO CLAVE: Marcamos como inactivo
+
+            // 3. Guardamos el cambio (el registro se mantiene, pero 'activo' es false)
+            usuarioRepository.save(usuario);
+
+            return true; // La operación de "eliminación lógica" fue exitosa
+        }).orElse(false); // Si no se encuentra el UUID, devuelve false (404 Not Found)
     }
 }

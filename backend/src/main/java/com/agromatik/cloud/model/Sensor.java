@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import org.hibernate.annotations.DynamicInsert;
-import org.locationtech.jts.geom.Point;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -41,8 +40,9 @@ public class Sensor {
     @Column(length = 100)
     private String fabricante;
 
-    @Column(name = "ubicacion_geografica", columnDefinition = "point")
-    private Point ubicacionGeografica;
+    // Cambiado de Point a String
+    @Column(name = "ubicacion_geografica", length = 100)
+    private String ubicacionGeografica;
 
     @Column(name = "fecha_instalacion")
     private LocalDate fechaInstalacion;
@@ -52,7 +52,7 @@ public class Sensor {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado")
-    private EstadoSensor estado = EstadoSensor.activo;
+    private EstadoSensor estado = EstadoSensor.ACTIVO;
 
     @Column(name = "bateria_nivel")
     private Integer bateriaNivel;
@@ -67,19 +67,19 @@ public class Sensor {
     private Huerta huerta;
 
     public enum TipoSensor {
-        temperatura,
-        humedad_suelo,
-        humedad_ambiental,
-        ph,
-        luz,
-        viento,
-        lluvia
+        TEMPERATURA,
+        HUMEDAD_SUELO,
+        HUMEDAD_AMBIENTAL,
+        PH,
+        LUZ,
+        VIENTO,
+        LLUVIA
     }
 
     public enum EstadoSensor {
-        activo,
-        inactivo,
-        mantenimiento,
-        falla
+        ACTIVO,
+        INACTIVO,
+        MANTENIMIENTO,
+        FALLA
     }
 }

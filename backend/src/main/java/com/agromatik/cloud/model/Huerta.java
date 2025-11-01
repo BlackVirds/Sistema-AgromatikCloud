@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
-import org.locationtech.jts.geom.Point;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -33,8 +32,10 @@ public class Huerta {
     private String nombre;
 
     private String descripcion;
-    @Column(name = "ubicacion_geografica", columnDefinition = "point")
-    private Point ubicacionGeografica;
+
+    // 🔹 Cambiado de Point a String
+    @Column(name = "ubicacion_geografica", length = 255)
+    private String ubicacionGeografica;
 
     private String direccion;
 

@@ -39,6 +39,7 @@ public class ActividadHuerta {
     private TipoActividad tipoActividad;
 
     private String descripcion;
+
     private LocalDateTime fechaActividad;
     private LocalDateTime fechaProgramada;
 
