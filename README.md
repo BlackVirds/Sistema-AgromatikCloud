@@ -1,8 +1,14 @@
-### Diagrama de Base de Datos
+## 🗄️ Diagrama de Base de Datos
 
-Puedes consultar el Diagrama Entidad-Relación (DER) del proyecto en el siguiente enlace:
+El siguiente diagrama muestra la estructura del modelo de datos del proyecto **Agromatik Cloud**, incluyendo las entidades principales, sus relaciones y claves foráneas.
 
-[Ver Diagrama de la Base de Datos](https://dbdiagram.io/d/AgromatikCloudDB-68da3ad3d2b621e42258e007)
+<div align="center">
+
+📊 **[👉 Ver Diagrama Entidad–Relación (DER)](https://dbdiagram.io/d/AgromatikCloudDB-68da3ad3d2b621e42258e007)**  
+
+</div>
+
+> Este diagrama fue generado con [dbdiagram.io](https://dbdiagram.io)
 
 # 🌾 API – Sistema Agromatik Cloud
 
