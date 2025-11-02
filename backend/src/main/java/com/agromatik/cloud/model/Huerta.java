@@ -58,7 +58,7 @@ public class Huerta {
     @Column(name="altitud_metros", precision=8, scale = 2)
     private BigDecimal altitudMetros;
     // Relación con Usuario (muchas huertas pueden pertenecer a un usuario)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "huertas"}) //  'huertas' para evitar el ciclo
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="usuario_id", nullable=false)
     private Usuario usuario;
