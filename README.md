@@ -1,56 +1,104 @@
-## 🗄️ Diagrama de Base de Datos
+# Agromatik Cloud - API Backend
 
-El siguiente diagrama muestra la estructura del modelo de datos del proyecto **Agromatik Cloud**, incluyendo las entidades principales, sus relaciones y claves foráneas.
+Descripción
+----------
+Agromatik Cloud es el backend para gestionar usuarios, huertas, sensores, lecturas, cultivos, alertas y actividades agrícolas. Este repositorio contiene las rutas principales de la API y la documentación básica del modelo de datos.
 
-<div align="center">
 
-📊 **[👉 Ver Diagrama Entidad–Relación (DER)](https://dbdiagram.io/d/AgromatikCloudDB-68da3ad3d2b621e42258e007)**  
+Tabla de contenidos
+------------------
+- [Diagrama de Base de Datos](#diagrama-de-base-de-datos)
+- [Rutas de la API](#rutas-de-la-api)
+- [Autenticación](#autenticación)
+- [Ejemplos (cURL)](#ejemplos-curl)
+- [Instalación y ejecución](#instalación-y-ejecución)
+- [Variables de entorno](#variables-de-entorno)
+- [Contribuir](#contribuir)
+- [Licencia](#licencia)
 
-</div>
+Diagrama de Base de Datos
+-------------------------
+El diagrama muestra la estructura del modelo de datos (entidades principales, relaciones y claves foráneas).
 
-> Este diagrama fue generado con [dbdiagram.io](https://dbdiagram.io)
+📊 Ver Diagrama Entidad–Relación (DER): https://dbdiagram.io/d/AgromatikCloudDB-68da3ad3d2b621e42258e007
 
-# 🌾 API – Sistema Agromatik Cloud
+Nota: el diagrama fue generado con dbdiagram.io.
 
-## 📡 Rutas del Backend
+Rutas de la API
+----------------
+A continuación un resumen de los endpoints disponibles (organizados por módulo). Los parámetros entre llaves {} indican variables de ruta o query.
 
-| **Módulo** | **Método HTTP** | **Ruta** | **Descripción / Parámetros** |
-|-------------|------------------|-----------|-------------------------------|
-| **Usuarios** | GET | `/api/usuarios` | Obtener todos los usuarios |
-|  | GET | `/api/usuarios/{uuid}` | Obtener usuario por UUID |
-|  | POST | `/api/usuarios` | Crear un nuevo usuario |
-|  | PUT | `/api/usuarios/{uuid}` | Actualizar usuario por UUID |
-|  | DELETE | `/api/usuarios/{uuid}` | Eliminar usuario por UUID |
-| **Sensores** | GET | `/api/sensores` | Obtener todos los sensores |
-|  | GET | `/api/sensores/{uuid}` | Obtener sensor por UUID |
-|  | GET | `/api/sensores/huerta/{huertaId}` | Obtener sensores de una huerta |
-|  | POST | `/api/sensores` | Crear un sensor |
-|  | PUT | `/api/sensores/{uuid}` | Actualizar sensor por UUID |
-|  | DELETE | `/api/sensores/{uuid}` | Eliminar sensor por UUID |
-| **Lecturas** | POST | `/api/lecturas` | Registrar nueva lectura de sensor |
-|  | GET | `/api/lecturas/sensor/{uuid}/ultima` | Obtener última lectura por sensor |
-|  | GET | `/api/lecturas/sensor/{uuid}` | Obtener historial de lecturas |
-|  | GET | `/api/lecturas/sensor/{uuid}/rango?inicio={fechaInicio}&fin={fechaFin}` | Lecturas por rango de fechas |
-| **Huertas** | GET | `/api/huertas` | Obtener todas las huertas |
-|  | GET | `/api/huertas/{uuid}` | Obtener huerta por UUID |
-|  | GET | `/api/huertas/usuarios/{usuarioId}` | Obtener huertas por usuario |
-|  | POST | `/api/huertas` | Crear una huerta |
-|  | PUT | `/api/huertas/{uuid}` | Actualizar huerta por UUID |
-|  | DELETE | `/api/huertas/{uuid}` | Eliminar huerta por UUID |
-| **Cultivos** | GET | `/api/cultivos` | Obtener todos los cultivos |
-|  | GET | `/api/cultivos/huerta/{huertaId}` | Obtener cultivos por huerta |
-|  | GET | `/api/cultivos/{uuid}` | Obtener cultivo por UUID |
-|  | POST | `/api/cultivos` | Crear cultivo |
-|  | PUT | `/api/cultivos/{uuid}` | Actualizar cultivo por UUID |
-|  | DELETE | `/api/cultivos/{uuid}` | Eliminar cultivo por UUID |
-| **Alertas** | GET | `/api/alertas?pagina={pagina}&tamano={tamano}` | Obtener alertas paginadas |
-|  | GET | `/api/alertas/{id}` | Obtener alerta por ID |
-|  | PUT | `/api/alertas/{id}/leida` | Marcar alerta como leída |
-| **Actividades Huerta** | GET | `/api/actividades-huerta` | Obtener todas las actividades |
-|  | GET | `/api/actividades-huerta/{id}` | Obtener actividad por ID |
-|  | GET | `/api/actividades-huerta/huerta/{huertaId}` | Actividades por huerta |
-|  | GET | `/api/actividades-huerta/cultivo/{cultivoId}` | Actividades por cultivo |
-|  | POST | `/api/actividades-huerta` | Crear nueva actividad |
-|  | PUT | `/api/actividades-huerta/{id}` | Actualizar actividad por ID |
-|  | DELETE | `/api/actividades-huerta/{id}` | Eliminar actividad por ID |
+Usuarios
+- GET    /api/usuarios
+- GET    /api/usuarios/{uuid}
+- POST   /api/usuarios
+- PUT    /api/usuarios/{uuid}
+- DELETE /api/usuarios/{uuid}
+
+Sensores
+- GET    /api/sensores
+- GET    /api/sensores/{uuid}
+- GET    /api/sensores/huerta/{huertaId}
+- POST   /api/sensores
+- PUT    /api/sensores/{uuid}
+- DELETE /api/sensores/{uuid}
+
+Lecturas
+- POST   /api/lecturas
+- GET    /api/lecturas/sensor/{uuid}/ultima
+- GET    /api/lecturas/sensor/{uuid}
+- GET    /api/lecturas/sensor/{uuid}/rango?inicio={fechaInicio}&fin={fechaFin}
+
+Huertas
+- GET    /api/huertas
+- GET    /api/huertas/{uuid}
+- GET    /api/huertas/usuarios/{usuarioId}
+- POST   /api/huertas
+- PUT    /api/huertas/{uuid}
+- DELETE /api/huertas/{uuid}
+
+Cultivos
+- GET    /api/cultivos
+- GET    /api/cultivos/huerta/{huertaId}
+- GET    /api/cultivos/{uuid}
+- POST   /api/cultivos
+- PUT    /api/cultivos/{uuid}
+- DELETE /api/cultivos/{uuid}
+
+Alertas
+- GET    /api/alertas?pagina={pagina}&tamano={tamano}
+- GET    /api/alertas/{id}
+- PUT    /api/alertas/{id}/leida
+
+Actividades Huerta
+- GET    /api/actividades-huerta
+- GET    /api/actividades-huerta/{id}
+- GET    /api/actividades-huerta/huerta/{huertaId}
+- GET    /api/actividades-huerta/cultivo/{cultivoId}
+- POST   /api/actividades-huerta
+- PUT    /api/actividades-huerta/{id}
+- DELETE /api/actividades-huerta/{id}
+
+Autenticación
+-------------
+
+
+
+Instalación y ejecución
+-----------------------
+
+
+Variables de entorno (ejemplo)
+------------------------------
+
+
+Contribuir
+----------
+
+Licencia
+--------
+
+
+Notas y recomendaciones
+-----------------------
 
