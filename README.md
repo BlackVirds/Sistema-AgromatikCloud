@@ -48,11 +48,3 @@ Puedes consultar el Diagrama Entidad-Relación (DER) del proyecto en el siguient
 |  | PUT | `/api/actividades-huerta/{id}` | Actualizar actividad por ID |
 |  | DELETE | `/api/actividades-huerta/{id}` | Eliminar actividad por ID |
 
-
----
-
-## 🧪 Ejemplos de uso (cURL / Postman)
-
-### 🔹 Obtener todas las huertas
-```bash
-curl -X GET http://localhost:8080/api/huertas
