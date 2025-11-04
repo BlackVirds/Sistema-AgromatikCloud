@@ -96,7 +96,8 @@ const AlertsDashboard: React.FC = () => {
           </h3>
           <p>{alerta.descripcion}</p>
           <p>
-            Huerta: {alerta.huerta.nombre} | Valor: {alerta.valorActual}
+            Huerta: {alerta.huerta.nombre} | Valor:{" "}
+            {alerta.valorActual.toFixed(2)}
           </p>
 
           {!alerta.leida && (
