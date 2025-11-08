@@ -21,3 +21,8 @@ spring:
 
 server:
   port: 8080
+
+app:
+  jwt:
+    secret: "EstaEsMiClaveSecretaSuperLargaParaAgromatikCloud2025"
+    expiration-ms: 86400000 # 24 horas en milisegundos
