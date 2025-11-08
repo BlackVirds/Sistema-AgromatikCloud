@@ -55,20 +55,50 @@ public class UsuarioService {
         });
     }
 
-    public Usuario save(Usuario usuario){
-        usuarioRepository.findByEmail(usuario.getEmail()).ifPresent(u -> {
-            throw new IllegalStateException("El email " + usuario.getEmail() + " ya está registrado.");
-        });
-        // Obtenemos la contraseña en texto plano que envió el usuario
-        String plainPassword = usuario.getPasswordHash();
+    public Usuario save(Usuario usuarioNuevosDatos){
+        // 1. Buscar si el email ya existe en la BD
+        Optional<Usuario> usuarioExistenteOpt = usuarioRepository.findByEmail(usuarioNuevosDatos.getEmail());
 
-        // La 'hasheamos'
-        String hashedPassword = passwordEncoder.encode(plainPassword);
+        if (usuarioExistenteOpt.isPresent()) {
+            // --- EL EMAIL YA EXISTE ---
+            Usuario usuarioExistente = usuarioExistenteOpt.get();
 
-        // Reemplazamos el texto plano por el hash
-        usuario.setPasswordHash(hashedPassword);
+            if (usuarioExistente.getActivo()) {
+                // Caso 1: El email existe y el usuario está ACTIVO.
+                // No se puede registrar. Lanzamos el error.
+                throw new IllegalStateException("El email " + usuarioNuevosDatos.getEmail() + " ya está registrado y activo.");
 
-        return usuarioRepository.save(usuario);
+            } else {
+                // Caso 2: El email existe pero está INACTIVO (Soft Deleted).
+                // ¡REACTIVAMOS LA CUENTA!
+                // Actualizamos el registro viejo con los datos del nuevo registro.
+
+                usuarioExistente.setNombre(usuarioNuevosDatos.getNombre());
+                usuarioExistente.setApellido(usuarioNuevosDatos.getApellido());
+                usuarioExistente.setTelefono(usuarioNuevosDatos.getTelefono());
+                usuarioExistente.setTipo(usuarioNuevosDatos.getTipo());
+                usuarioExistente.setSuscriptionPlan(usuarioNuevosDatos.getSuscriptionPlan());
+
+                // Hashear la NUEVA contraseña
+                usuarioExistente.setPasswordHash(passwordEncoder.encode(usuarioNuevosDatos.getPasswordHash()));
+
+                // ¡Reactivar!
+                usuarioExistente.setActivo(true);
+                // Opcional: Actualizar la fecha de registro/reactivación
+                // usuarioExistente.setFechaRegistro(LocalDateTime.now());
+
+                return usuarioRepository.save(usuarioExistente); // Guardamos el usuario ACTUALIZADO
+            }
+
+        } else {
+            // --- EL EMAIL NO EXISTE ---
+            // Caso 3: Es un usuario completamente nuevo.
+
+            // Hashear la contraseña
+            usuarioNuevosDatos.setPasswordHash(passwordEncoder.encode(usuarioNuevosDatos.getPasswordHash()));
+
+            return usuarioRepository.save(usuarioNuevosDatos); // Guardamos el usuario NUEVO
+        }
     }
 
     public boolean deleteByUuid(String uuid) {
