@@ -25,9 +25,6 @@ public class CultivoService {
         this.huertaRepository = huertaRepository;
     }
 
-    public List<Cultivo> getAll(){
-        return cultivoRepository.findAll();
-    }
     /**
      * ✅ MÉTODO SEGURO (CONSCIENTE DE ROL)
      * Obtiene todos los cultivos.
