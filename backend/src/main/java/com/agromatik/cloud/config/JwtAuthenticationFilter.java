@@ -48,8 +48,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-            // Si el token es válido
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+            //  MODIFICACIÓN IMPORTANTE
+            // Verificamos que el token sea válido Y que la cuenta esté habilitada (isEnabled() lee el 'activo')
+            if (jwtService.isTokenValid(jwt, userDetails) && userDetails.isEnabled()) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null, // No se necesitan credenciales (password)
@@ -59,6 +60,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 // Establecer la autenticación en el contexto de seguridad
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+            else {
+                // Si el token es válido PERO la cuenta está deshabilitada (activo=false),
+                // limpiamos el contexto para asegurar que la petición sea rechazada.
+                SecurityContextHolder.clearContext();
             }
         }
         filterChain.doFilter(request, response);

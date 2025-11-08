@@ -32,9 +32,15 @@ public class JpaUserDetailsService implements UserDetailsService {
                 new SimpleGrantedAuthority("ROLE_" + usuario.getTipo().name())
         );
 
+        // MODIFICACIÓN IMPORTANTE
+        // Usamos el constructor completo de UserDetails para pasar el estado 'activo'.
         return new User(
                 usuario.getEmail(),
                 usuario.getPasswordHash(),
+                usuario.getActivo(), // enabled (true si está activo, false si está "soft-deleted")
+                true, // accountNonExpired (asumimos true)
+                true, // credentialsNonExpired (asumimos true)
+                true, // accountNonLocked (asumimos true)
                 authorities
         );
     }

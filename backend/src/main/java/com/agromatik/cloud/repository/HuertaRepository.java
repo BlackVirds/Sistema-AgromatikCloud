@@ -9,4 +9,7 @@ import java.util.Optional;
 public interface HuertaRepository extends JpaRepository<Huerta, Long> {
     List<Huerta> findByUsuarioId(Long usuarioId); //listar todas las huertas de un usuario
     Optional<Huerta> findByUuid(String uuid); //buscar una huerta específica por su UUID
+
+    // Busca huertas por el email del usuario autenticado
+    List<Huerta> findByUsuarioEmail(String email);
 }

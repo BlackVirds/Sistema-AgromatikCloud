@@ -1,13 +1,13 @@
 package com.agromatik.cloud.config;
 
-
 import com.agromatik.cloud.servicio.JpaUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod; // ❗ 1. IMPORTAR HttpMethod
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider; // 1. IMPORTAR
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider; // 2. IMPORTAR
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration; // 3. IMPORTAR
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -33,8 +33,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // 2. SE CREA EL PROVEEDOR DE AUTENTICACIÓN
-    // Le dice a Spring Security CÓMO autenticar (usando JpaUserDetailsService y BCrypt)
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -43,8 +41,6 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    // 3. SE EXPONE EL AUTHENTICATION MANAGER
-    // Spring Boot 3 crea esto automáticamente. Solo necesitas exponerlo como un Bean.
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
@@ -56,13 +52,23 @@ public class SecurityConfig {
                 // Deshabilitar CSRF
                 .csrf(csrf -> csrf.disable())
 
-                // Definir reglas de autorización
+                // REGLAS DE AUTORIZACIÓN
                 .authorizeHttpRequests(auth -> auth
-                        // Endpoints públicos (login y registro)
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/usuarios").permitAll() // Permitir registro de usuarios
 
-                        // Proteger el resto de endpoints
+                        // 1. Endpoints Públicos (Login y Registro)
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() // Solo POST (Registro) es público
+
+                        // 2. Endpoint de Usuario (Borrarse a sí mismo)
+                        .requestMatchers(HttpMethod.DELETE, "/api/usuarios/me").authenticated() // Regla para permitir a los usuarios darde de baja
+                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/me").authenticated() // Regla para permitir a los usuarios actualizar su informacion
+
+                        // 3. Endpoints de Admin (Gestión de Usuarios)
+                        // Todas las demás operaciones en /api/usuarios son SOLO para ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios").hasRole("ADMIN")
+                        .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
+
+                        // 4. Endpoints Protegidos (Para usuarios autenticados)
                         .requestMatchers("/api/huertas/**").authenticated()
                         .requestMatchers("/api/sensores/**").authenticated()
                         .requestMatchers("/api/cultivos/**").authenticated()
@@ -70,10 +76,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/alertas/**").authenticated()
                         .requestMatchers("/api/actividades-huerta/**").authenticated()
 
-                        // (Opcional) Regla de Admin
-                        // .requestMatchers("/api/usuarios/**").hasRole("ADMIN") // Descomentar si e ocupa proteger /api/usuarios
-
-                        // Cualquier otra petición debe ser autenticada
+                        // 5. Cualquier otra petición
                         .anyRequest().authenticated()
                 )
 
@@ -82,7 +85,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // 4. ✅ AÑADIR EL PROVEEDOR AL FILTRO
+                // AÑADIR EL PROVEEDOR AL FILTRO
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

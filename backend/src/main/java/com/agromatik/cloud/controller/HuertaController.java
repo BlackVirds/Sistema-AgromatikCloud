@@ -19,9 +19,12 @@ public class HuertaController {
         this.huertaService = huertaService;
     }
 
+    /**
+     * Devuelve todas las huertas (si es Admin) o solo las del usuario autenticado.
+     */
     @GetMapping
     public List<Huerta> getAllHuertas(){
-        return huertaService.getAll();
+        return huertaService.getHuertasPorContexto();
     }
     //Obtener la huerca por UUID
     @GetMapping("/{uuid}")
