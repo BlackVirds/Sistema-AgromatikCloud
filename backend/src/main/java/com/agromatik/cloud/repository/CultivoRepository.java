@@ -16,4 +16,7 @@ public interface CultivoRepository extends JpaRepository<Cultivo, Long> {
     // Busca cultivos de UNA huerta específica, validando que pertenezca al email del usuario.
     List<Cultivo> findByHuertaIdAndHuertaUsuarioEmail(Long huertaId, String email);
 
+    //Para asegurar GET/PUT/DELETE por UUID
+    Optional<Cultivo> findByUuidAndHuertaUsuarioEmail(String uuid, String email);
+
 }

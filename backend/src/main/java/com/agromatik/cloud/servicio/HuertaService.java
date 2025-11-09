@@ -28,104 +28,116 @@ public class HuertaService {
         this.usuarioRepository = usuarioRepository;
     }
 
+    // --- Métodos Auxiliares de Seguridad ---
+
+    private Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    private boolean esAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+    }
+
+    private String getEmailUsuario(Authentication authentication) {
+        return ((UserDetails) authentication.getPrincipal()).getUsername();
+    }
+
+
     /**
      * Devuelve todas las huertas (si es Admin) o solo las del usuario.
      */
     public List<Huerta> getHuertasPorContexto() {
-        // 1. Obtener la identidad del token JWT
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        // 2. Revisar si el usuario tiene el rol ADMIN
-        boolean esAdmin = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(role -> role.equals("ROLE_ADMIN"));
-
-        // 3. Lógica de filtrado
-        if (esAdmin) {
+        Authentication auth = getAuthentication();
+        if (esAdmin(auth)) {
             return huertaRepository.findAll(); // ADMIN ve TODO
         } else {
-            // Usuario normal filtra por su email (que es el username)
-            String emailUsuario = ((UserDetails) authentication.getPrincipal()).getUsername();
+            String emailUsuario = getEmailUsuario(auth);
             return huertaRepository.findByUsuarioEmail(emailUsuario);
         }
     }
 
+    /**
+     * Busca una huerta por UUID, solo si eres Admin o si te pertenece.
+     */
     public Optional<Huerta> getByUuid(String uuid) {
-        return huertaRepository.findByUuid(uuid);
+        Authentication auth = getAuthentication();
+        if (esAdmin(auth)) {
+            return huertaRepository.findByUuid(uuid); // Admin busca por UUID
+        } else {
+            String email = getEmailUsuario(auth);
+            return huertaRepository.findByUuidAndUsuarioEmail(uuid, email);
+        }
     }
 
     /**
-     * Permite obtener las huertas de un usuario específico,
-     * solo si el usuario autenticado es ADMIN o si pide sus propias huertas.
+     * Obtiene las huertas de un usuario específico (validando permisos).
      */
     public List<Huerta> getByUsuarioId(Long usuarioId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String emailUsuario = ((UserDetails) authentication.getPrincipal()).getUsername();
+        Authentication auth = getAuthentication();
+        String emailUsuario = getEmailUsuario(auth);
 
-        boolean esAdmin = authentication.getAuthorities().stream()
-                .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));;
-
-        // 1. El Admin puede ver las huertas de CUALQUIER ID
-        if (esAdmin) {
+        if (esAdmin(auth)) {
             return huertaRepository.findByUsuarioId(usuarioId);
         }
 
-        // 2. Un usuario normal solo puede ver sus propias huertas
         Usuario usuarioAutenticado = usuarioRepository.findByEmail(emailUsuario)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario autenticado no encontrado"));
 
         if (usuarioAutenticado.getId().equals(usuarioId)) {
             return huertaRepository.findByUsuarioId(usuarioId);
         } else {
-            // Acceso denegado si intenta espiar los recursos de otro usuario.
             throw new SecurityException("Acceso denegado. No tiene permiso para ver los recursos de este usuario.");
         }
     }
 
+    /**
+     * El 'save' ignora el ID de usuario del JSON y usa el ID del token.
+     */
     public Huerta save(Huerta huerta) {
 
-        Long usuarioId = huerta.getUsuario().getId();
+        //OBTENER EL USUARIO DEL TOKEN (IGNORA EL JSON)
+        Authentication auth = getAuthentication();
+        String emailUsuario = getEmailUsuario(auth);
 
-        if (usuarioId == null) {
-            throw new IllegalArgumentException("El ID del usuario es obligatorio para crear una huerta.");
-        }
+        Usuario usuarioAutenticado = usuarioRepository.findByEmail(emailUsuario)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario autenticado no encontrado. No se puede crear la huerta."));
 
-        // Validar ubicación geográfica solo si no está vacía
+        //ASIGNAR EL USUARIO DEL TOKEN (Máxima Seguridad)
+        huerta.setUsuario(usuarioAutenticado);
+
+        // 3. Validar ubicación (tu lógica existente)
         if (huerta.getUbicacionGeografica() != null && !huerta.getUbicacionGeografica().isBlank()) {
             validarUbicacion(huerta.getUbicacionGeografica());
         }
 
-        // Buscamos al usuario en la BD
-        Usuario usuarioExistente = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new EntityNotFoundException("No se encontró el usuario con ID: " + usuarioId));
-
-        //Si existe, adjuntamos el objeto Usuario real a la huerta
-        huerta.setUsuario(usuarioExistente);
-
-        //guardamos
         return huertaRepository.save(huerta);
     }
 
+    /**
+     * Desactiva (Soft Delete) una huerta, solo si te pertenece (o eres Admin).
+     */
     public boolean deleteByUuid(String uuid) {
-        return huertaRepository.findByUuid(uuid).map(huerta -> {
-
-            // Si la huerta ya está inactiva, salimos con éxito.
+        // Usa getByUuid (que ya es seguro y filtra por rol) para encontrar la huerta.
+        // Si no la encuentra O no le pertenece, 'map' no se ejecuta y devuelve false.
+        return this.getByUuid(uuid).map(huerta -> {
             if (huerta.getActiva() == null || !huerta.getActiva()) {
                 return true;
             }
-
-            // 1. Aplicamos el Soft Delete
             huerta.setActiva(false);
-
-            // 2. Guardamos el cambio
             huertaRepository.save(huerta);
-
             return true;
         }).orElse(false);
     }
 
+    /**
+     * Actualiza una huerta, solo si te pertenece (o eres Admin).
+     */
     public Optional<Huerta> updateByUuid(String uuid, Huerta updatedHuerta) {
-        return huertaRepository.findByUuid(uuid).map(existing -> {
+        // Usa getByUuid (que ya es seguro) para encontrar la huerta.
+        // Si no la encuentra O no le pertenece, 'map' no se ejecuta.
+        return this.getByUuid(uuid).map(existing -> {
 
             if (updatedHuerta.getNombre() != null) {
                 existing.setNombre(updatedHuerta.getNombre());
@@ -134,11 +146,9 @@ public class HuertaService {
                 existing.setDescripcion(updatedHuerta.getDescripcion());
             }
             if (updatedHuerta.getUbicacionGeografica() != null && !updatedHuerta.getUbicacionGeografica().isBlank()) {
-                // 🔹 Valida solo si tiene valor real
                 validarUbicacion(updatedHuerta.getUbicacionGeografica());
                 existing.setUbicacionGeografica(updatedHuerta.getUbicacionGeografica());
             } else if (updatedHuerta.getUbicacionGeografica() != null && updatedHuerta.getUbicacionGeografica().isBlank()) {
-                // 🔹 Si explícitamente mandan una cadena vacía, limpiamos el campo
                 existing.setUbicacionGeografica(null);
             }
             if (updatedHuerta.getDireccion() != null) {
