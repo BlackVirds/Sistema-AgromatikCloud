@@ -1,9 +1,14 @@
 package com.agromatik.cloud.servicio;
 import com.agromatik.cloud.model.*;
 import com.agromatik.cloud.repository.AlertaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page; // 👈 NECESARIO
 import org.springframework.data.domain.Pageable; // 👈 NECESARIO
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,31 +55,75 @@ public class AlertaService {
         }
     }
 
-    // --- MÉTODOS CRUD DE CONSULTA (REQUERIDOS POR EL CONTROLLER) ---
+    // --- MÉTODOS CRUD DE CONSULTA (AHORA SEGUROS) ---
+
+    private Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    private boolean esAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+    }
+
+    private String getEmailUsuario(Authentication authentication) {
+        return ((UserDetails) authentication.getPrincipal()).getUsername();
+    }
 
     /**
-     * Obtiene una página de alertas para listado general (GET /api/alertas).
+     *Obtiene una página de alertas (Seguro)
      */
     public Page<Alerta> obtenerAlertas(Pageable pageable) {
-        return alertaRepository.findAll(pageable);
+        Authentication auth = getAuthentication();
+        if (esAdmin(auth)) {
+            return alertaRepository.findAll(pageable);
+        } else {
+            String email = getEmailUsuario(auth);
+            return alertaRepository.findByUsuarioEmail(email, pageable);
+        }
     }
 
     /**
-     * Obtiene una alerta específica por su ID (GET /api/alertas/{id}).
+     *Obtiene una alerta específica por su ID (Seguro)
      */
     public Optional<Alerta> obtenerPorId(Long id) {
-        return alertaRepository.findById(id);
+        Authentication auth = getAuthentication();
+        if (esAdmin(auth)) {
+            return alertaRepository.findById(id);
+        } else {
+            String email = getEmailUsuario(auth);
+            return alertaRepository.findByIdAndUsuarioEmail(id, email);
+        }
     }
 
     /**
-     * Marca una alerta como leída (PUT /api/alertas/{id}/leida).
+     * ✅ Marca una alerta como leída (Seguro)
      */
     @Transactional
     public void marcarComoLeida(Long id) {
-        alertaRepository.findById(id).ifPresent(alerta -> {
-            // Asumiendo que tu entidad Alerta tiene un campo 'leida' y un setter
+        Authentication auth = getAuthentication();
+
+        Optional<Alerta> alertaOpt = alertaRepository.findById(id);
+        if (alertaOpt.isEmpty()) {
+            throw new EntityNotFoundException("Alerta no encontrada");
+        }
+
+        Alerta alerta = alertaOpt.get();
+
+        if (esAdmin(auth)) {
+            // Admin puede marcarla
             alerta.setLeida(true);
             alertaRepository.save(alerta);
-        });
+        } else {
+            // Usuario normal solo marca si le pertenece
+            String email = getEmailUsuario(auth);
+            if (alerta.getUsuario().getEmail().equals(email)) {
+                alerta.setLeida(true);
+                alertaRepository.save(alerta);
+            } else {
+                throw new SecurityException("Acceso denegado. No tiene permiso para modificar esta alerta.");
+            }
+        }
     }
 }

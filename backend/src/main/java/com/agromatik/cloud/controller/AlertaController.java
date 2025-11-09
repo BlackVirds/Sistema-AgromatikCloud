@@ -50,7 +50,6 @@ public class AlertaController {
     @PutMapping("/{id}/leida")
     public ResponseEntity<Void> marcarAlertaComoLeida(@PathVariable Long id) {
 
-        // Asumiendo que el AlertaServicio tiene un método marcarComoLeida(Long id)
         alertaService.marcarComoLeida(id);
         return ResponseEntity.noContent().build();
     }
