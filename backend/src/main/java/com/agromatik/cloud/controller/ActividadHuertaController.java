@@ -18,6 +18,9 @@ public class ActividadHuertaController {
         this.actividadService = actividadService;
     }
 
+    /**
+     * Devuelve todas las actividades (Admin) o solo las del usuario.
+     */
     @GetMapping
     public List<ActividadHuerta> getAllActividades() {
         return actividadService.getAll();
@@ -30,11 +33,17 @@ public class ActividadHuertaController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     *Filtra por ID de Huerta Y por usuario.
+     */
     @GetMapping("/huerta/{huertaId}")
     public List<ActividadHuerta> getActividadesByHuerta(@PathVariable Long huertaId) {
         return actividadService.getByHuerta(huertaId);
     }
 
+    /**
+     * Filtra por ID de Cultivo Y por usuario.
+     */
     @GetMapping("/cultivo/{cultivoId}")
     public List<ActividadHuerta> getActividadesByCultivo(@PathVariable Long cultivoId) {
         return actividadService.getByCultivo(cultivoId);

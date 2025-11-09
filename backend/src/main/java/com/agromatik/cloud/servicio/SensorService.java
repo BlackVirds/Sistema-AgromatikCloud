@@ -5,6 +5,10 @@ import com.agromatik.cloud.model.Sensor;
 import com.agromatik.cloud.repository.HuertaRepository;
 import com.agromatik.cloud.repository.SensorRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,16 +27,45 @@ public class SensorService {
         this.huertaRepository = huertaRepository;
     }
 
+    /**
+     * Devuelve todos los sensores (si es Admin) o solo los del usuario.
+     */
     public List<Sensor> getAll(){
-        return sensorRepository.findAll();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean esAdmin = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+
+        if (esAdmin) {
+            return sensorRepository.findAll();
+        } else {
+            String emailUsuario = ((UserDetails) authentication.getPrincipal()).getUsername();
+            return sensorRepository.findByHuertaUsuarioEmail(emailUsuario);
+        }
     }
+
 
     public Optional<Sensor> getByUuid(String uuid){
         return sensorRepository.findByUuid(uuid);
     }
 
-    public List<Sensor>getByHuerta(Long huertaId){
-        return sensorRepository.findByHuertaId(huertaId);
+    /**
+     *Obtiene sensores de UNA huerta, validando que la huerta sea del usuario.
+     */
+    public List<Sensor> getByHuerta(Long huertaId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean esAdmin = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+
+        if (esAdmin) {
+            return sensorRepository.findByHuertaId(huertaId);
+        } else {
+            String emailUsuario = ((UserDetails) authentication.getPrincipal()).getUsername();
+            return sensorRepository.findByHuertaIdAndHuertaUsuarioEmail(huertaId, emailUsuario);
+        }
     }
 
     public Sensor save(Sensor sensor){
@@ -114,15 +147,15 @@ public class SensorService {
     public boolean delete(String uuid) {
         return sensorRepository.findByUuid(uuid).map(sensor -> {
 
-            // 1. Opcional: Si el sensor ya está inactivo o fallido, consideramos el borrado lógico exitoso
+            // Si el sensor ya está inactivo o fallido, consideramos el borrado lógico exitoso
             if (sensor.getEstado() == Sensor.EstadoSensor.INACTIVO || sensor.getEstado() == Sensor.EstadoSensor.FALLA) {
                 return true;
             }
 
-            // 2. Aplicamos el Soft Delete: Cambiamos el estado a 'inactivo'
+            //Aplicamos el Soft Delete: Cambiamos el estado a 'inactivo'
             sensor.setEstado(Sensor.EstadoSensor.INACTIVO);
 
-            // 3. Guardamos el cambio (el registro se mantiene en la BD)
+            //Guardamos el cambio (el registro se mantiene en la BD)
             sensorRepository.save(sensor);
 
             return true;

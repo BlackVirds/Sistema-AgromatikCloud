@@ -19,6 +19,9 @@ public class SensorController {
         this.sensorService = sensorService;
     }
 
+    /**
+     * Llama al método 'getAll()' del servicio, que ahora filtra por rol.
+     */
     @GetMapping
     public List<Sensor> getAllSensores(){
         return sensorService.getAll();
@@ -32,6 +35,9 @@ public class SensorController {
 
     }
 
+    /**
+     * Llama al método 'getByHuerta()' del servicio, que ahora filtra por rol.
+     */
     @GetMapping("/huerta/{huertaId}")
     public List<Sensor> getSensorByHuerta(@PathVariable Long huertaId){
         return sensorService.getByHuerta(huertaId);

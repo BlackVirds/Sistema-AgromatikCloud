@@ -9,6 +9,10 @@ import com.agromatik.cloud.repository.CultivoRepository;
 import com.agromatik.cloud.repository.HuertaRepository;
 import com.agromatik.cloud.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,16 +35,58 @@ public class ActividadHuertaService {
         this.cultivoRepository = cultivoRepository;
         this.usuarioRepository = usuarioRepository;
     }
+    /**
+     * Devuelve todas las actividades (Admin) o solo las del usuario.
+     */
     public List<ActividadHuerta> getAll(){
-        return actividadHuertaRepository.findAll();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean esAdmin = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+
+        if (esAdmin) {
+            return actividadHuertaRepository.findAll();
+        } else {
+            String emailUsuario = ((UserDetails) authentication.getPrincipal()).getUsername();
+            return actividadHuertaRepository.findByHuertaUsuarioEmail(emailUsuario);
+        }
     }
 
+    /**
+     * Filtra por ID de Cultivo Y por usuario.
+     */
     public List<ActividadHuerta> getByCultivo(Long cultivoId){
-        return  actividadHuertaRepository.findByCultivoId(cultivoId);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean esAdmin = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+
+        if (esAdmin) {
+            return actividadHuertaRepository.findByCultivoId(cultivoId);
+        } else {
+            String emailUsuario = ((UserDetails) authentication.getPrincipal()).getUsername();
+            return actividadHuertaRepository.findByCultivoIdAndHuertaUsuarioEmail(cultivoId, emailUsuario);
+        }
     }
 
+    /**
+     * Filtra por ID de Huerta Y por usuario.
+     */
     public List<ActividadHuerta> getByHuerta(Long huertaId) {
-        return actividadHuertaRepository.findByHuertaId(huertaId);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean esAdmin = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+
+        if (esAdmin) {
+            return actividadHuertaRepository.findByHuertaId(huertaId);
+        } else {
+            String emailUsuario = ((UserDetails) authentication.getPrincipal()).getUsername();
+            return actividadHuertaRepository.findByHuertaIdAndHuertaUsuarioEmail(huertaId, emailUsuario);
+        }
     }
 
     public Optional<ActividadHuerta> getById(Long id){
