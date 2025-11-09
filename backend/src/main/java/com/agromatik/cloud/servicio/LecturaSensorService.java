@@ -10,6 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,37 +60,65 @@ public class LecturaSensorService {
 
         return savedLectura;
     }
+    // --- MÉTODOS DE CONSULTA DE HISTORIAL (AHORA SEGUROS) ---
 
+    private Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    private boolean esAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+    }
+
+    private String getEmailUsuario(Authentication authentication) {
+        return ((UserDetails) authentication.getPrincipal()).getUsername();
+    }
     // --- MÉTODOS DE CONSULTA DE HISTORIAL (Faltantes) ---
 
     /**
-     * 1. Obtiene la ÚLTIMA lectura registrada para un sensor por UUID.
-     * (Usado por el endpoint: /sensor/{uuid}/ultima)
+     * Obtiene la ÚLTIMA lectura (Seguro)
      */
     public Optional<LecturaSensor> findLatestBySensorUuid(String uuid) {
-        // Llama al método del repositorio limitando a 1 registro para obtener el más reciente.
-        return lecturaRepository.findLatestBySensorUuid(uuid, PageRequest.of(0, 1)).stream().findFirst();
+        Authentication auth = getAuthentication();
+        Pageable limit = PageRequest.of(0, 1);
+
+        if (esAdmin(auth)) {
+            return lecturaRepository.findLatestBySensorUuid(uuid, limit).stream().findFirst();
+        } else {
+            String email = getEmailUsuario(auth);
+            return lecturaRepository.findLatestBySensorUuidAndUsuarioEmail(uuid, email, limit).stream().findFirst();
+        }
     }
 
     /**
-     * 2. Obtiene el HISTORIAL paginado de lecturas de un sensor.
-     * (Usado por el endpoint: /sensor/{uuid})
+     *  Obtiene el HISTORIAL paginado (Seguro)
      */
     public Page<LecturaSensor> findHistoryBySensorUuid(String uuid, Pageable pageable) {
-        // Llama al método derivado del repositorio para obtener la lista paginada.
-        return lecturaRepository.findBySensorUuidOrderByTimestampDesc(uuid, pageable);
+        Authentication auth = getAuthentication();
+
+        if (esAdmin(auth)) {
+            return lecturaRepository.findBySensorUuidOrderByTimestampDesc(uuid, pageable);
+        } else {
+            String email = getEmailUsuario(auth);
+            return lecturaRepository.findBySensorUuidAndSensorHuertaUsuarioEmailOrderByTimestampDesc(uuid, email, pageable);
+        }
     }
 
     /**
-     * 3. Obtiene lecturas en un RANGO de fecha.
-     * (Usado por el endpoint: /sensor/{uuid}/rango)
+     * Obtiene lecturas en un RANGO de fecha (Seguro)
      */
     public List<LecturaSensor> findRangeBySensorUuid(String uuid, LocalDate inicio, LocalDate fin) {
-
-        // Conversión crítica: LocalDate (00:00:00) a LocalDateTime (23:59:59)
+        Authentication auth = getAuthentication();
         LocalDateTime inicioDateTime = inicio.atStartOfDay();
         LocalDateTime finDateTime = fin.atTime(LocalTime.MAX);
 
-        return lecturaRepository.findBySensorUuidAndTimestampBetween(uuid, inicioDateTime, finDateTime);
+        if (esAdmin(auth)) {
+            return lecturaRepository.findBySensorUuidAndTimestampBetween(uuid, inicioDateTime, finDateTime);
+        } else {
+            String email = getEmailUsuario(auth);
+            return lecturaRepository.findBySensorUuidAndSensorHuertaUsuarioEmailAndTimestampBetween(uuid, email, inicioDateTime, finDateTime);
+        }
     }
 }
