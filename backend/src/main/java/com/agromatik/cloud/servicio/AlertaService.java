@@ -98,7 +98,7 @@ public class AlertaService {
     }
 
     /**
-     * ✅ Marca una alerta como leída (Seguro)
+     *Marca una alerta como leída (Seguro)
      */
     @Transactional
     public void marcarComoLeida(Long id) {

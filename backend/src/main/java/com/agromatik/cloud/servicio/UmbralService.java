@@ -18,6 +18,7 @@ public class UmbralService {
         // Inicializar umbrales para los tipos de sensor
         umbrales.put("HUMEDAD_SUELO", new Umbral(20.0, 75.0));
         umbrales.put("TEMPERATURA", new Umbral(15.0, 35.0));
+        umbrales.put("PH", new Umbral(6.0, 7.5));
     }
 
     // Método para clasificar la severidad según la desviación del valor

@@ -15,4 +15,9 @@ public interface SensorRepository extends JpaRepository<Sensor, Long> {
 
     //Busca sensores de UNA huerta específica, validando que pertenezca al email del usuario.
     List<Sensor> findByHuertaIdAndHuertaUsuarioEmail(Long huertaId, String email);
+
+    // Para asegurar GET/PUT/DELETE por UUID
+    Optional<Sensor> findByUuidAndHuertaUsuarioEmail(String uuid, String email);
+
+    List<Sensor> findByEstado(Sensor.EstadoSensor estado);
 }
