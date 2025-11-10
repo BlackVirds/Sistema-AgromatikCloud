@@ -25,4 +25,16 @@ public interface LecturaSensorRepository extends JpaRepository<LecturaSensor, Lo
 
     // 3. Obtener lecturas en un rango de fecha (para análisis específico)
     List<LecturaSensor> findBySensorUuidAndTimestampBetween(String uuid, LocalDateTime inicio, LocalDateTime fin);
+
+    // --- MÉTODOS NUEVOS PARA FILTRADO DE USUARIO (SEGURIDAD) ---
+
+    // (Seguro) Obtener la última lectura, validando pertenencia
+    @Query("SELECT l FROM LecturaSensor l WHERE l.sensor.uuid = :uuid AND l.sensor.huerta.usuario.email = :email ORDER BY l.timestamp DESC")
+    List<LecturaSensor> findLatestBySensorUuidAndUsuarioEmail(String uuid, String email, Pageable pageable);
+
+    // (Seguro) Obtener historial paginado, validando pertenencia
+    Page<LecturaSensor> findBySensorUuidAndSensorHuertaUsuarioEmailOrderByTimestampDesc(String uuid, String email, Pageable pageable);
+
+    //(Seguro) Obtener rango de fechas, validando pertenencia
+    List<LecturaSensor> findBySensorUuidAndSensorHuertaUsuarioEmailAndTimestampBetween(String uuid, String email, LocalDateTime inicio, LocalDateTime fin);
 }

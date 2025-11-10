@@ -7,6 +7,11 @@ import com.agromatik.cloud.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import static com.agromatik.cloud.util.ValidacionesUtil.validarUbicacion;
+// Imports de Seguridad
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 
 import java.util.List;
@@ -23,62 +28,116 @@ public class HuertaService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public List<Huerta> getAll() {
-        return huertaRepository.findAll();
+    // --- Métodos Auxiliares de Seguridad ---
+
+    private Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 
+    private boolean esAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+    }
+
+    private String getEmailUsuario(Authentication authentication) {
+        return ((UserDetails) authentication.getPrincipal()).getUsername();
+    }
+
+
+    /**
+     * Devuelve todas las huertas (si es Admin) o solo las del usuario.
+     */
+    public List<Huerta> getHuertasPorContexto() {
+        Authentication auth = getAuthentication();
+        if (esAdmin(auth)) {
+            return huertaRepository.findAll(); // ADMIN ve TODO
+        } else {
+            String emailUsuario = getEmailUsuario(auth);
+            return huertaRepository.findByUsuarioEmail(emailUsuario);
+        }
+    }
+
+    /**
+     * Busca una huerta por UUID, solo si eres Admin o si te pertenece.
+     */
     public Optional<Huerta> getByUuid(String uuid) {
-        return huertaRepository.findByUuid(uuid);
+        Authentication auth = getAuthentication();
+        if (esAdmin(auth)) {
+            return huertaRepository.findByUuid(uuid); // Admin busca por UUID
+        } else {
+            String email = getEmailUsuario(auth);
+            return huertaRepository.findByUuidAndUsuarioEmail(uuid, email);
+        }
     }
 
+    /**
+     * Obtiene las huertas de un usuario específico (validando permisos).
+     */
     public List<Huerta> getByUsuarioId(Long usuarioId) {
-        return huertaRepository.findByUsuarioId(usuarioId);
-    }
+        Authentication auth = getAuthentication();
+        String emailUsuario = getEmailUsuario(auth);
 
-    public Huerta save(Huerta huerta) {
-
-        Long usuarioId = huerta.getUsuario().getId();
-
-        if (usuarioId == null) {
-            throw new IllegalArgumentException("El ID del usuario es obligatorio para crear una huerta.");
+        if (esAdmin(auth)) {
+            return huertaRepository.findByUsuarioId(usuarioId);
         }
 
-        // 🔹 Validar ubicación geográfica solo si no está vacía
+        Usuario usuarioAutenticado = usuarioRepository.findByEmail(emailUsuario)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario autenticado no encontrado"));
+
+        if (usuarioAutenticado.getId().equals(usuarioId)) {
+            return huertaRepository.findByUsuarioId(usuarioId);
+        } else {
+            throw new SecurityException("Acceso denegado. No tiene permiso para ver los recursos de este usuario.");
+        }
+    }
+
+    /**
+     * El 'save' ignora el ID de usuario del JSON y usa el ID del token.
+     */
+    public Huerta save(Huerta huerta) {
+
+        //OBTENER EL USUARIO DEL TOKEN (IGNORA EL JSON)
+        Authentication auth = getAuthentication();
+        String emailUsuario = getEmailUsuario(auth);
+
+        Usuario usuarioAutenticado = usuarioRepository.findByEmail(emailUsuario)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario autenticado no encontrado. No se puede crear la huerta."));
+
+        //ASIGNAR EL USUARIO DEL TOKEN (Máxima Seguridad)
+        huerta.setUsuario(usuarioAutenticado);
+
+        // 3. Validar ubicación (tu lógica existente)
         if (huerta.getUbicacionGeografica() != null && !huerta.getUbicacionGeografica().isBlank()) {
             validarUbicacion(huerta.getUbicacionGeografica());
         }
 
-        // Buscamos al usuario en la BD
-        Usuario usuarioExistente = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new EntityNotFoundException("No se encontró el usuario con ID: " + usuarioId));
-
-        //Si existe, adjuntamos el objeto Usuario real a la huerta
-        huerta.setUsuario(usuarioExistente);
-
-        //guardamos
         return huertaRepository.save(huerta);
     }
 
+    /**
+     * Desactiva (Soft Delete) una huerta, solo si te pertenece (o eres Admin).
+     */
     public boolean deleteByUuid(String uuid) {
-        return huertaRepository.findByUuid(uuid).map(huerta -> {
-
-            // Si la huerta ya está inactiva, salimos con éxito.
+        // Usa getByUuid (que ya es seguro y filtra por rol) para encontrar la huerta.
+        // Si no la encuentra O no le pertenece, 'map' no se ejecuta y devuelve false.
+        return this.getByUuid(uuid).map(huerta -> {
             if (huerta.getActiva() == null || !huerta.getActiva()) {
                 return true;
             }
-
-            // 1. Aplicamos el Soft Delete
             huerta.setActiva(false);
-
-            // 2. Guardamos el cambio
             huertaRepository.save(huerta);
-
             return true;
         }).orElse(false);
     }
 
+    /**
+     * Actualiza una huerta, solo si te pertenece (o eres Admin).
+     */
     public Optional<Huerta> updateByUuid(String uuid, Huerta updatedHuerta) {
-        return huertaRepository.findByUuid(uuid).map(existing -> {
+        // Usa getByUuid (que ya es seguro) para encontrar la huerta.
+        // Si no la encuentra O no le pertenece, 'map' no se ejecuta.
+        return this.getByUuid(uuid).map(existing -> {
 
             if (updatedHuerta.getNombre() != null) {
                 existing.setNombre(updatedHuerta.getNombre());
@@ -87,11 +146,9 @@ public class HuertaService {
                 existing.setDescripcion(updatedHuerta.getDescripcion());
             }
             if (updatedHuerta.getUbicacionGeografica() != null && !updatedHuerta.getUbicacionGeografica().isBlank()) {
-                // 🔹 Valida solo si tiene valor real
                 validarUbicacion(updatedHuerta.getUbicacionGeografica());
                 existing.setUbicacionGeografica(updatedHuerta.getUbicacionGeografica());
             } else if (updatedHuerta.getUbicacionGeografica() != null && updatedHuerta.getUbicacionGeografica().isBlank()) {
-                // 🔹 Si explícitamente mandan una cadena vacía, limpiamos el campo
                 existing.setUbicacionGeografica(null);
             }
             if (updatedHuerta.getDireccion() != null) {

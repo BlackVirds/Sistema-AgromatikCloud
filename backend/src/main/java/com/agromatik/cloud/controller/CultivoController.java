@@ -20,15 +20,20 @@ public class CultivoController {
         this.cultivoService = cultivoService;
     }
 
+    /**
+     *
+     * Devuelve todos los cultivos (si es Admin) o solo los del usuario.
+     */
     @GetMapping
     public List<Cultivo> getAllCultivos(){
-        return cultivoService.getAll();
+        return cultivoService.getAllCultivosPorContexto();
     }
-
-    //Obtener cultivos por huerta
+    /**
+     * Devuelve cultivos de una huerta, si el usuario tiene permiso.
+     */
     @GetMapping("/huerta/{huertaId}")
     public List<Cultivo> getAllCultivosByHuerta(@PathVariable Long huertaId){
-        return cultivoService.getByHuerta(huertaId);
+        return cultivoService.getByHuertaIdPorContexto(huertaId);
     }
 
     @GetMapping("/{uuid}")

@@ -119,4 +119,47 @@ public class UsuarioService {
             return true; // La operación de "eliminación lógica" fue exitosa
         }).orElse(false); // Si no se encuentra el UUID, devuelve false (404 Not Found)
     }
+
+    public boolean deleteByEmail(String email) {
+        // Busca al usuario por email para el soft delete
+        return usuarioRepository.findByEmail(email).map(usuario -> {
+
+            if (usuario.getActivo() == null || !usuario.getActivo()) {
+                return true; // Ya estaba inactivo
+            }
+
+            usuario.setActivo(false); // Desactivación Lógica
+            usuarioRepository.save(usuario);
+
+            return true;
+        }).orElse(false); // No se encontró el email
+    }
+
+    /**
+     * (USUARIO) Actualiza solo los campos "seguros" de su propio perfil.
+     * El email se obtiene del token JWT.
+     */
+    public Optional<Usuario> updateMiPerfil(String emailUsuario, Usuario datosActualizados) {
+        return usuarioRepository.findByEmail(emailUsuario).map(usuarioExistente -> {
+
+            // El usuario SÍ puede actualizar esto:
+            if (datosActualizados.getNombre() != null) {
+                usuarioExistente.setNombre(datosActualizados.getNombre());
+            }
+            if (datosActualizados.getApellido() != null) {
+                usuarioExistente.setApellido(datosActualizados.getApellido());
+            }
+            if (datosActualizados.getTelefono() != null) {
+                usuarioExistente.setTelefono(datosActualizados.getTelefono());
+            }
+            if (datosActualizados.getConfiguraciones() != null) {
+                usuarioExistente.setConfiguraciones(datosActualizados.getConfiguraciones());
+            }
+
+            // El usuario NO PUEDE actualizar su rol (tipo) ni su estado (activo)
+            // Tampoco su plan de suscripción (esto debería ir en un endpoint de /pagos)
+
+            return usuarioRepository.save(usuarioExistente);
+        });
+    }
 }

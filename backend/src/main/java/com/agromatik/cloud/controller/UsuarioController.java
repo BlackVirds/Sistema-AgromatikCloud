@@ -3,6 +3,9 @@ package com.agromatik.cloud.controller;
 import com.agromatik.cloud.model.Usuario;
 import com.agromatik.cloud.servicio.UsuarioService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,5 +49,34 @@ public class UsuarioController {
     public ResponseEntity<Void> deleteUsuarioByUuid(@PathVariable String uuid) {
         boolean eliminado = usuarioService.deleteByUuid(uuid);
         return eliminado ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Endpoint para que un usuario autenticado elimine (desactive) SU PROPIA cuenta.
+     * Es un "Soft Delete".
+     */
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteMiCuenta() {
+        // Obtener el email del usuario desde el token JWT
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String emailUsuario = ((UserDetails) authentication.getPrincipal()).getUsername();
+
+        // Llamar a un metodo de servicio para borrar por email
+        boolean eliminado = usuarioService.deleteByEmail(emailUsuario);
+
+        return eliminado ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    /**
+     * NUEVO ENDPOINT (PUT /me)
+     * Permite a un usuario autenticado actualizar sus propios datos (nombre, teléfono, etc.)
+     */
+    @PutMapping("/me")
+    public ResponseEntity<Usuario> updateMiCuenta(@RequestBody Usuario datosActualizados) {
+        String emailUsuario = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+
+        return usuarioService.updateMiPerfil(emailUsuario, datosActualizados)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
