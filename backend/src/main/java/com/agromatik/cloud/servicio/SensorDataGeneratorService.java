@@ -3,7 +3,7 @@ import com.agromatik.cloud.dto.SensorDataDTO;
 import com.agromatik.cloud.model.Sensor;
 import com.agromatik.cloud.repository.SensorRepository;
 import lombok.RequiredArgsConstructor;
-// import org.springframework.data.domain.PageRequest; // (No se usa PageRequest)
+// import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-// ❗ Importar el enum anidado
+//Importar el enum anidado
 import com.agromatik.cloud.model.Sensor.EstadoSensor;
 
 @Service
@@ -48,10 +48,11 @@ public class SensorDataGeneratorService {
             }
 
             SensorDataDTO data = SensorDataDTO.builder()
-                    .sensorUuid(sensor.getUuid())
+                    //CAMBIO CRÍTICO: Enviar el nombre del sensor
+                    .sensorNombre(sensor.getNombre())
                     .valor(valor)
                     .unidad(getUnitForType(tipo))
-                    .rawData("{\"simulacion_timestamp\": \"" + LocalDateTime.now() + "\", \"tipo_simulado\": \"" + tipo + "\"}")
+                    .rawData("...")
                     .build();
 
             try {
@@ -69,7 +70,7 @@ public class SensorDataGeneratorService {
 
     private Double generateValueForType(String tipo) {
 
-        // 7% de probabilidad de generar una alerta
+        // 6% de probabilidad de generar una alerta
         boolean forzarAlerta = random.nextInt(100) < 6;
 
         switch (tipo) {

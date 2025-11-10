@@ -37,9 +37,9 @@ public class LecturaSensorService {
     @Transactional
     public LecturaSensor recibirYProcesarLectura(SensorDataDTO dto) {
 
-        // 1. VALIDACIÓN FK: Buscar el sensor por UUID (Obligatorio)
-        Sensor sensor = sensorRepository.findByUuid(dto.getSensorUuid())
-                .orElseThrow(() -> new EntityNotFoundException("Sensor no encontrado con UUID: " + dto.getSensorUuid()));
+        // CAMBIO CRÍTICO: Buscar el sensor por NOMBRE (el ID externo)
+        Sensor sensor = sensorRepository.findByNombre(dto.getSensorNombre())
+                .orElseThrow(() -> new EntityNotFoundException("Sensor no encontrado con Nombre: " + dto.getSensorNombre()));
 
         // 2. MAPEO: Crear la entidad LecturaSensor
         BigDecimal valorDecimal = BigDecimal.valueOf(dto.getValor());

@@ -20,4 +20,7 @@ public interface SensorRepository extends JpaRepository<Sensor, Long> {
     Optional<Sensor> findByUuidAndHuertaUsuarioEmail(String uuid, String email);
 
     List<Sensor> findByEstado(Sensor.EstadoSensor estado);
+
+    // Para buscar el sensor por su nombre (enviado por la API externa)
+    Optional<Sensor> findByNombre(String nombre);
 }

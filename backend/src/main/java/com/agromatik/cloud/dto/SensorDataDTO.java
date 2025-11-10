@@ -14,9 +14,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class SensorDataDTO {
 
-    // CLAVE: UUID del sensor que envía el dato (para buscar la FK).
-    @NotBlank(message = "El UUID del sensor es obligatorio")
-    private String sensorUuid;
+    //CAMBIO CRÍTICO: De 'sensorUuid' a 'sensorNombre'
+    @NotBlank(message = "El nombre del sensor es obligatorio")
+    private String sensorNombre;
 
     // Valor medido por el sensor. Usamos Double para la evaluación de umbrales.
     @NotNull(message = "El valor de la lectura es obligatorio")

@@ -27,7 +27,8 @@ public class Sensor {
     @Column(unique = true, nullable=false, length = 36)
     private String uuid = UUID.randomUUID().toString();
 
-    @Column(nullable = false)
+    //Añadir unique = true y length = 255
+    @Column(nullable = false, unique = true, length = 255)
     private String nombre;
 
     @Enumerated(EnumType.STRING)
