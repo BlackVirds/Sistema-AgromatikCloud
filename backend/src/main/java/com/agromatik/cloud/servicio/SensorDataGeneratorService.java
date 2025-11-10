@@ -1,10 +1,9 @@
 package com.agromatik.cloud.servicio;
-
 import com.agromatik.cloud.dto.SensorDataDTO;
 import com.agromatik.cloud.model.Sensor;
 import com.agromatik.cloud.repository.SensorRepository;
 import lombok.RequiredArgsConstructor;
-// import org.springframework.data.domain.PageRequest;
+// import org.springframework.data.domain.PageRequest; // (No se usa PageRequest)
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
+// ❗ Importar el enum anidado
 import com.agromatik.cloud.model.Sensor.EstadoSensor;
 
 @Service
@@ -23,12 +23,12 @@ public class SensorDataGeneratorService {
     private final Random random = new Random();
 
     /**
-     * Genera datos aleatorios cada 7 segundos SOLO para sensores ACTIVOS.
+     * Genera datos aleatorios cada 70 segundos SOLO para sensores ACTIVOS.
      */
-    @Scheduled(fixedDelay = 7000)
+    @Scheduled(fixedDelay = 70000) // 70,000 milisegundos = 70 segundos
     public void generateAndSendReadings() {
 
-        //Llamamos al nuevo método del repositorio
+        // Llama al método del repositorio para buscar solo sensores ACTIVOS
         List<Sensor> sensoresActivos = sensorRepository.findByEstado(EstadoSensor.ACTIVO);
 
         if (sensoresActivos.isEmpty()) {
@@ -55,6 +55,7 @@ public class SensorDataGeneratorService {
                     .build();
 
             try {
+                // Llama al servicio para guardar, validar FK y evaluar alertas
                 lecturaService.recibirYProcesarLectura(data);
                 System.out.printf("SIMULACIÓN OK: Enviada lectura de %.2f %s para Sensor %s%n", valor, data.getUnidad(), sensor.getNombre());
 
@@ -67,27 +68,38 @@ public class SensorDataGeneratorService {
     // --- MÉTODOS AUXILIARES DE SIMULACIÓN ---
 
     private Double generateValueForType(String tipo) {
-        // 15% de probabilidad de alerta
-        boolean forzarAlerta = random.nextInt(100) < 15;
+
+        // 7% de probabilidad de generar una alerta
+        boolean forzarAlerta = random.nextInt(100) < 6;
 
         switch (tipo) {
             case "TEMPERATURA":
                 if (forzarAlerta) {
-                    return 8.0 + random.nextDouble() * 5.0; // 8 a 13°C
+                    // 7% del tiempo: Generar un valor CRÍTICO (Frío o Calor extremo)
+                    if (random.nextBoolean()) {
+                        return 8.0 + random.nextDouble() * 4.0; // Frío (8-12°C)
+                    } else {
+                        return 38.0 + random.nextDouble() * 4.0; // Calor (38-42°C)
+                    }
                 }
-                return 25.0 + random.nextGaussian() * 3.0; // Normal
+                // 93% del tiempo: Valor NORMAL (Centrado en 25°C)
+                return 25.0 + random.nextGaussian() * 3.0;
 
             case "HUMEDAD_SUELO":
                 if (forzarAlerta) {
-                    return 10.0 + random.nextDouble() * 8.0; // 10 a 18%
+                    // 7% del tiempo: Valor CRÍTICO (Sequía)
+                    return 10.0 + random.nextDouble() * 5.0; // 10% a 15%
                 }
-                return 40.0 + random.nextGaussian() * 15.0; // Normal
+                // 93% del tiempo: Valor NORMAL (Centrado en 50%)
+                return 50.0 + random.nextGaussian() * 10.0;
 
             case "PH":
                 if (forzarAlerta) {
-                    return 5.0 + random.nextDouble() * 0.5; // Ácido (asumiendo umbral 6.0)
+                    // 7% del tiempo: Valor CRÍTICO (Ácido)
+                    return 5.0 + random.nextDouble() * 0.5; // Ácido (5.0 - 5.5)
                 }
-                return 6.5 + random.nextDouble() * 1.5; // Normal
+                // 93% del tiempo: Valor NORMAL
+                return 7.0 + random.nextGaussian() * 0.5;
 
             default:
                 // No simular tipos desconocidos

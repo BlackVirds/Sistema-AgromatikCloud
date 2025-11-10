@@ -52,21 +52,21 @@ public class SecurityConfig {
                 // Deshabilitar CSRF
                 .csrf(csrf -> csrf.disable())
 
-                // REGLAS DE AUTORIZACIÓN
+                // REGLAS DE AUTORIZACIÓN REORDENADAS (DE MÁS ESPECÍFICO A GENERAL)
                 .authorizeHttpRequests(auth -> auth
 
                         // 1. Endpoints Públicos (Login y Registro)
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() // Solo POST (Registro) es público
+                        .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() // Específico
 
-                        // 2. Endpoint de Usuario (Borrarse a sí mismo)
-                        .requestMatchers(HttpMethod.DELETE, "/api/usuarios/me").authenticated() // Regla para permitir a los usuarios darde de baja
-                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/me").authenticated() // Regla para permitir a los usuarios actualizar su informacion
+                        // 2. Endpoints de Usuario (Self-Service)
+                        .requestMatchers(HttpMethod.DELETE, "/api/usuarios/me").authenticated() // Específico
+                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/me").authenticated() // Específico
 
                         // 3. Endpoints de Admin (Gestión de Usuarios)
-                        // Todas las demás operaciones en /api/usuarios son SOLO para ADMIN
+                        // (Estas reglas ahora van ANTES de las de 'authenticated()')
                         .requestMatchers(HttpMethod.GET, "/api/usuarios").hasRole("ADMIN")
-                        .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
+                        .requestMatchers("/api/usuarios/**").hasRole("ADMIN") // General para /usuarios/
 
                         // 4. Endpoints Protegidos (Para usuarios autenticados)
                         .requestMatchers("/api/huertas/**").authenticated()
