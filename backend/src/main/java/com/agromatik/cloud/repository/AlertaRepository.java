@@ -59,20 +59,37 @@ public interface AlertaRepository extends JpaRepository<Alerta, Long> {
     @Query("UPDATE Alerta a SET a.leida = true WHERE a.leida = false AND a.usuario.email = :email")
     void marcarTodasComoLeidasSiPertenecen(String email);
 
-    // MÉTODO NUEVO PARA REPORTE DE FRECUENCIA ---
+    // MÉTODOS DE REPORTE DE FRECUENCIA (AMBAS OPCIONES) ---
 
-    /**
-     * Cuenta cuántas alertas de cada tipo (parámetro) ha tenido un usuario
-     * en un rango de fechas.
-     */
-    @Query("SELECT new com.agromatik.cloud.dto.ReporteFrecuenciaAlertasDTO(a.parametro, COUNT(a.id)) " +
+    //**
+     //* Opción A (General): Cuenta y agrupa por TODAS las huertas del usuario.
+     //*/
+    @Query("SELECT new com.agromatik.cloud.dto.ReporteFrecuenciaAlertasDTO(" + // 👈 CORREGIDO
+            "a.huerta.id, a.huerta.nombre, a.parametro, COUNT(a.id)) " +
             "FROM Alerta a " +
             "WHERE a.usuario.email = :email " +
             "AND a.fechaCreacion BETWEEN :inicio AND :fin " +
-            "GROUP BY a.parametro " +
-            "ORDER BY COUNT(a.id) DESC") // Ordena del problema más frecuente al menos frecuente
-    List<ReporteFrecuenciaAlertasDTO> getConteoAlertasPorParametro(
+            "GROUP BY a.huerta.id, a.huerta.nombre, a.parametro " +
+            "ORDER BY a.huerta.id, COUNT(a.id) DESC")
+    List<ReporteFrecuenciaAlertasDTO> getConteoAgrupadoGeneral(
             @Param("email") String email,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fin") LocalDateTime fin);
+
+    /**
+     * Opción B (Específico): Cuenta y agrupa, pero solo para UNA huerta.
+     */
+    @Query("SELECT new com.agromatik.cloud.dto.ReporteFrecuenciaAlertasDTO(" +
+            "a.huerta.id, a.huerta.nombre, a.parametro, COUNT(a.id)) " +
+            "FROM Alerta a " +
+            "WHERE a.usuario.email = :email " +
+            "AND a.huerta.id = :huertaId " +
+            "AND a.fechaCreacion BETWEEN :inicio AND :fin " +
+            "GROUP BY a.huerta.id, a.huerta.nombre, a.parametro " +
+            "ORDER BY COUNT(a.id) DESC")
+    List<ReporteFrecuenciaAlertasDTO> getConteoAgrupadoPorHuerta(
+            @Param("email") String email,
+            @Param("huertaId") Long huertaId,
             @Param("inicio") LocalDateTime inicio,
             @Param("fin") LocalDateTime fin);
 }

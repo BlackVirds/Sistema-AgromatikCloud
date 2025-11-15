@@ -80,16 +80,28 @@ public class ReporteService {
     //MÉTODO NUEVO PARA REPORTE DE FRECUENCIA DE ALERTAS ---
 
     /**
-     * Genera un reporte de frecuencia de alertas (cuántas de cada tipo)
-     * para el usuario autenticado.
+     * Genera un reporte de frecuencia de alertas.
+     * Si huertaId es null, agrupa todas las huertas del usuario.
+     * Si huertaId NO es null, filtra solo para esa huerta.
      */
-    public List<ReporteFrecuenciaAlertasDTO> getReporteFrecuenciaAlertas(LocalDate inicio, LocalDate fin) {
+    public List<ReporteFrecuenciaAlertasDTO> getReporteFrecuenciaAlertas(
+            Long huertaId, // 👈 AHORA ES OPCIONAL (puede ser null)
+            LocalDate inicio,
+            LocalDate fin) {
+
         Authentication auth = getAuthentication();
         String email = getEmailUsuario(auth);
         LocalDateTime inicioDT = inicio.atStartOfDay();
         LocalDateTime finDT = fin.atTime(LocalTime.MAX);
 
-        return alertaRepository.getConteoAlertasPorParametro(email, inicioDT, finDT);
+        if (huertaId == null) {
+            // Opción A: General (Agrupado por todas sus huertas)
+            return alertaRepository.getConteoAgrupadoGeneral(email, inicioDT, finDT);
+        } else {
+            // Opción B: Específico (Filtrado por una huerta)
+            // (La consulta JPQL ya valida la pertenencia (email + huertaId))
+            return alertaRepository.getConteoAgrupadoPorHuerta(email, huertaId, inicioDT, finDT);
+        }
     }
     //MÉTODO DE REPORTE DE CORRELACIÓN (CORREGIDO)
 

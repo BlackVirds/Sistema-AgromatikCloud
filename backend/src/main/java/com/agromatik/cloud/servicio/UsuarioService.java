@@ -82,7 +82,7 @@ public class UsuarioService {
                 // Hashear la NUEVA contraseña
                 usuarioExistente.setPasswordHash(passwordEncoder.encode(usuarioNuevosDatos.getPasswordHash()));
 
-                // ¡Reactivar!
+                // Reactivar
                 usuarioExistente.setActivo(true);
                 // Opcional: Actualizar la fecha de registro/reactivación
                 // usuarioExistente.setFechaRegistro(LocalDateTime.now());

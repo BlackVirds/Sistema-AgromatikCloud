@@ -54,17 +54,20 @@ public class ReporteController {
     //ENDPOINT NUEVO PARA FRECUENCIA DE ALERTAS ---
 
     /**
-     * Endpoint para la gráfica de Frecuencia de Alertas (Pie Chart/Barras).
-     * Muestra qué parámetro (ej. HUMEDAD_SUELO) está fallando más.
-     * * Ejemplo de Petición:
-     * GET /api/reportes/frecuencia-alertas?inicio=2025-10-01&fin=2025-10-31
+     * Endpoint para la gráfica de Frecuencia de Alertas
+     * Muestra qué parámetro está fallando más.
+     * Acepta un 'huertaId' opcional como Query Param
+     * GET /api/reportes/frecuencia-alertas?inicio=...&fin=... (General)
+     * GET /api/reportes/frecuencia-alertas?huertaId=2&inicio=...&fin=... (Específico)
      */
-    @GetMapping("/frecuencia-alertas")
+    @GetMapping("/frecuencia-alertas") // Ruta general
     public ResponseEntity<List<ReporteFrecuenciaAlertasDTO>> getReporteFrecuencia(
+            // huertaId' ES OPCIONAL
+            @RequestParam(required = false) Long huertaId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin) {
 
-        List<ReporteFrecuenciaAlertasDTO> reporte = reporteService.getReporteFrecuenciaAlertas(inicio, fin);
+        List<ReporteFrecuenciaAlertasDTO> reporte = reporteService.getReporteFrecuenciaAlertas(huertaId, inicio, fin);
         return ResponseEntity.ok(reporte);
     }
 

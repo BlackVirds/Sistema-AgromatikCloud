@@ -52,7 +52,7 @@ public class SensorDataGeneratorService {
                     .sensorNombre(sensor.getNombre())
                     .valor(valor)
                     .unidad(getUnitForType(tipo))
-                    .rawData("...")
+                    .rawData("{\"simulacion_timestamp\": \"" + LocalDateTime.now() + "\", \"tipo_simulado\": \"" + tipo + "\"}")
                     .build();
 
             try {

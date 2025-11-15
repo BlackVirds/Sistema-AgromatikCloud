@@ -62,7 +62,7 @@ public interface LecturaSensorRepository extends JpaRepository<LecturaSensor, Lo
     /**
      * (Seguro - Para Usuario) Proyección para el gráfico (solo fecha y valor).
      */
-    @Query("SELECT new com.agromatik.cloud.dto.ReporteCorrelacionDTO.PuntoDatos(l.timestamp, CAST(l.valor AS double)) " +
+    @Query("SELECT new com.agromatik.cloud.dto.ReporteCorrelacionDTO$PuntoDatos(l.timestamp, CAST(l.valor AS double)) " +
             "FROM LecturaSensor l " +
             "WHERE l.sensor.uuid = :uuid " +
             "AND l.sensor.huerta.usuario.email = :email " +

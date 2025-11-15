@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional; // 👈 NECESARIO
 
 @Service
@@ -49,6 +50,8 @@ public class AlertaService {
                     .titulo(titulo)
                     .descripcion(String.format("Lectura de %.2f %s fuera del rango [%.2f - %.2f]",
                             valor, lectura.getUnidad(), umbral.min(), umbral.max()))
+                    .leida(false)
+                    .fechaCreacion(LocalDateTime.now())
                     .build();
 
             alertaRepository.save(alerta);

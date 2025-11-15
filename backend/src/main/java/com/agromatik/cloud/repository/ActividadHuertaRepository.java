@@ -53,7 +53,7 @@ public interface ActividadHuertaRepository extends JpaRepository<ActividadHuerta
      * Proyección para los marcadores de eventos en el gráfico.
      * (Versión Segura para Usuario).
      */
-    @Query("SELECT new com.agromatik.cloud.dto.ReporteCorrelacionDTO.EventoActividad(a.fechaActividad, a.tipoActividad, a.descripcion) " +
+    @Query("SELECT new com.agromatik.cloud.dto.ReporteCorrelacionDTO$EventoActividad(a.fechaActividad, a.tipoActividad, a.descripcion) " +
             "FROM ActividadHuerta a " +
             "WHERE a.cultivo.id = :cultivoId " +
             "AND a.huerta.usuario.email = :email " + // Filtro de seguridad
