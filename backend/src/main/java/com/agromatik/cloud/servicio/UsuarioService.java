@@ -76,8 +76,8 @@ public class UsuarioService {
                 usuarioExistente.setNombre(usuarioNuevosDatos.getNombre());
                 usuarioExistente.setApellido(usuarioNuevosDatos.getApellido());
                 usuarioExistente.setTelefono(usuarioNuevosDatos.getTelefono());
-                usuarioExistente.setTipo(usuarioNuevosDatos.getTipo());
-                usuarioExistente.setSuscriptionPlan(usuarioNuevosDatos.getSuscriptionPlan());
+                usuarioExistente.setTipo(Usuario.TipoUsuario.AGRICULTOR);
+                usuarioExistente.setSuscriptionPlan(Usuario.PlanSuscripcion.BASICO); // (Forzamos el plan)
 
                 // Hashear la NUEVA contraseña
                 usuarioExistente.setPasswordHash(passwordEncoder.encode(usuarioNuevosDatos.getPasswordHash()));
@@ -93,7 +93,9 @@ public class UsuarioService {
         } else {
             // --- EL EMAIL NO EXISTE ---
             // Caso 3: Es un usuario completamente nuevo.
-
+            //CORRECCIÓN DE SEGURIDAD (Forzar rol Y plan por defecto)
+            usuarioNuevosDatos.setTipo(Usuario.TipoUsuario.AGRICULTOR);
+            usuarioNuevosDatos.setSuscriptionPlan(Usuario.PlanSuscripcion.BASICO);
             // Hashear la contraseña
             usuarioNuevosDatos.setPasswordHash(passwordEncoder.encode(usuarioNuevosDatos.getPasswordHash()));
 
