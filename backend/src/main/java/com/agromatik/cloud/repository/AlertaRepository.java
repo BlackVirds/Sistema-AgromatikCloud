@@ -1,13 +1,16 @@
 package com.agromatik.cloud.repository;
 
 import com.agromatik.cloud.model.Alerta;
+import com.agromatik.cloud.dto.ReporteFrecuenciaAlertasDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,4 +58,21 @@ public interface AlertaRepository extends JpaRepository<Alerta, Long> {
     @Modifying
     @Query("UPDATE Alerta a SET a.leida = true WHERE a.leida = false AND a.usuario.email = :email")
     void marcarTodasComoLeidasSiPertenecen(String email);
+
+    // MÉTODO NUEVO PARA REPORTE DE FRECUENCIA ---
+
+    /**
+     * Cuenta cuántas alertas de cada tipo (parámetro) ha tenido un usuario
+     * en un rango de fechas.
+     */
+    @Query("SELECT new com.agromatik.cloud.dto.ReporteFrecuenciaAlertasDTO(a.parametro, COUNT(a.id)) " +
+            "FROM Alerta a " +
+            "WHERE a.usuario.email = :email " +
+            "AND a.fechaCreacion BETWEEN :inicio AND :fin " +
+            "GROUP BY a.parametro " +
+            "ORDER BY COUNT(a.id) DESC") // Ordena del problema más frecuente al menos frecuente
+    List<ReporteFrecuenciaAlertasDTO> getConteoAlertasPorParametro(
+            @Param("email") String email,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fin") LocalDateTime fin);
 }

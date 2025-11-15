@@ -68,7 +68,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/usuarios").hasRole("ADMIN")
                         .requestMatchers("/api/usuarios/**").hasRole("ADMIN") // General para /usuarios/
 
-                        // 4. Endpoints Protegidos (Para usuarios autenticados)
+                        // Endpoints Protegidos (Para usuarios autenticados)
                         .requestMatchers("/api/huertas/**").authenticated()
                         .requestMatchers("/api/sensores/**").authenticated()
                         .requestMatchers("/api/cultivos/**").authenticated()
@@ -76,7 +76,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/alertas/**").authenticated()
                         .requestMatchers("/api/actividades-huerta/**").authenticated()
 
-                        // 5. Cualquier otra petición
+                        // REGLA DE REPORTES (SOLO USUARIOS, NO ADMIN)
+                        // Define explícitamente los roles que SÍ pueden ver reportes
+                        .requestMatchers("/api/reportes/**").hasAnyRole("AGRICULTOR", "EMPRESA", "COOPERATIVA")
+                        // Cualquier otra petición
                         .anyRequest().authenticated()
                 )
 
