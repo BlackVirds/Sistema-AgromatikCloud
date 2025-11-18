@@ -54,16 +54,21 @@ public class SecurityConfig {
 
                 // REGLAS DE AUTORIZACIÓN REORDENADAS (DE MÁS ESPECÍFICO A GENERAL)
                 .authorizeHttpRequests(auth -> auth
+                        // RUTAS DE SWAGGER (NUEVAS)
+                        // Permite acceso público a la UI y la definición de la API
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
 
-                        // 1. Endpoints Públicos (Login y Registro)
+                        // Endpoints Públicos (Login y Registro)
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() // Específico
 
-                        // 2. Endpoints de Usuario (Self-Service)
+                        // Endpoints de Usuario (Self-Service)
                         .requestMatchers(HttpMethod.DELETE, "/api/usuarios/me").authenticated() // Específico
                         .requestMatchers(HttpMethod.PUT, "/api/usuarios/me").authenticated() // Específico
 
-                        // 3. Endpoints de Admin (Gestión de Usuarios)
+                        // Endpoints de Admin (Gestión de Usuarios)
                         // (Estas reglas ahora van ANTES de las de 'authenticated()')
                         .requestMatchers(HttpMethod.GET, "/api/usuarios").hasRole("ADMIN")
                         .requestMatchers("/api/usuarios/**").hasRole("ADMIN") // General para /usuarios/

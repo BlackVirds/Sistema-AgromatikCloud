@@ -25,7 +25,7 @@ public class SensorDataGeneratorService {
     /**
      * Genera datos aleatorios cada 70 segundos SOLO para sensores ACTIVOS.
      */
-    @Scheduled(fixedDelay = 70000) // 70,000 milisegundos = 70 segundos
+    //@Scheduled(fixedDelay = 70000) // 70,000 milisegundos = 70 segundos
     public void generateAndSendReadings() {
 
         // Llama al método del repositorio para buscar solo sensores ACTIVOS
