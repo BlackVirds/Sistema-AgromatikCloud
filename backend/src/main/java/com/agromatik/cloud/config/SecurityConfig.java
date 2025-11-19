@@ -22,10 +22,12 @@ public class SecurityConfig {
 
     private final JpaUserDetailsService jpaUserDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final ApiKeyAuthFilter apiKeyAuthFilter;
 
-    public SecurityConfig(JpaUserDetailsService jpaUserDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JpaUserDetailsService jpaUserDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter, ApiKeyAuthFilter apiKeyAuthFilter) {
         this.jpaUserDetailsService = jpaUserDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.apiKeyAuthFilter = apiKeyAuthFilter;
     }
 
     @Bean
@@ -95,6 +97,8 @@ public class SecurityConfig {
 
                 // AÑADIR EL PROVEEDOR AL FILTRO
                 .authenticationProvider(authenticationProvider())
+                // AÑADIR EL FILTRO DE API KEY ANTES DEL JWT
+                .addFilterBefore(apiKeyAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
