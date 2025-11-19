@@ -74,4 +74,15 @@ public class LecturaSensorController {
         List<LecturaSensor> lecturas = lecturaService.findRangeBySensorUuid(uuid, inicio, fin);
         return ResponseEntity.ok(lecturas);
     }
+    /**
+     * Recibe una LISTA de JSONs ([{}, {}, ...])
+     * URL: POST /api/lecturas/batch
+     */
+    @PostMapping("/batch")
+    public ResponseEntity<String> recibirLecturasMasivas(@RequestBody List<SensorDataDTO> listaDatos) {
+
+        lecturaService.procesarLecturasMasivas(listaDatos);
+
+        return ResponseEntity.ok("Procesamiento completado. Total recibidos: " + listaDatos.size());
+    }
 }

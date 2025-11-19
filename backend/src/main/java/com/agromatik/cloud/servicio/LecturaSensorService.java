@@ -16,6 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired; // 1. Importar
+import org.springframework.context.annotation.Lazy; // 2. Importar
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -32,6 +34,10 @@ public class LecturaSensorService {
     private final SensorRepository sensorRepository;
     private final AlertaService alertaService;
 
+    // Usamos @Lazy para evitar un error de "dependencia circular" al arrancar
+    @Autowired
+    @Lazy
+    private LecturaSensorService self;
     // --- MÉTODOS CRUD/PROCESAMIENTO (Existentes) ---
 
     @Transactional
@@ -119,6 +125,23 @@ public class LecturaSensorService {
         } else {
             String email = getEmailUsuario(auth);
             return lecturaRepository.findBySensorUuidAndSensorHuertaUsuarioEmailAndTimestampBetween(uuid, email, inicioDateTime, finDateTime);
+        }
+    }
+
+    /**
+     * Procesa una LISTA de lecturas.
+     * Itera sobre la lista y guarda cada una individualmente.
+     * Si una falla, se registra el error pero las demás continúan (gracias al try-catch).
+     */
+    public void procesarLecturasMasivas(List<SensorDataDTO> listaLecturas) {
+        for (SensorDataDTO dto : listaLecturas) {
+            try {
+                // Reutilizamos la lógica segura que ya creamos
+                self.recibirYProcesarLectura(dto);
+            } catch (Exception e) {
+                // Si un sensor falla (ej. nombre incorrecto), lo logueamos y seguimos con el siguiente
+                System.err.println("Error al procesar lectura masiva para: " + dto.getSensorNombre() + " - " + e.getMessage());
+            }
         }
     }
 }
