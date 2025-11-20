@@ -72,7 +72,8 @@ public class Sensor {
             "activa",
             "altitudMetros",
             "fechaCreacion",
-            "ubicacionGeografica"
+            "ubicacionGeografica",
+            "tamañoHectareas"
     })
     @NotNull(message = "La huerta es obligatoria para crear un sensor")
     private Huerta huerta;
