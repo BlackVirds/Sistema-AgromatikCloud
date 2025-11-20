@@ -1,5 +1,6 @@
 package com.agromatik.cloud.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,17 +34,31 @@ public class Alerta {
     // --- Relaciones de tu esquema (necesarias para la navegación) ---
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnore
     private Usuario usuario;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "huerta_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "cultivos", "sensores"})
+    @JsonIgnoreProperties({
+            "hibernateLazyInitializer", "handler",
+            "usuario", "id", "uuid",
+            "descripcion",         // Texto largo innecesario
+            "ubicacionGeografica", // Coordenadas (pesado)
+            "pais",
+            "tamañoHectareas", "tipoSuelo", "altitudMetros",
+            "fechaCreacion", "activa"
+    })
     private Huerta huerta;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sensor_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "huerta"})
+    @JsonIgnoreProperties({
+            "hibernateLazyInitializer", "handler",
+            "huerta", "id",            // Evita recursión (ya tenemos la huerta arriba)
+            "modelo", "fabricante", "ubicacionGeografica",
+            "fechaInstalacion", "ultimoMantenimiento",
+            "bateriaNivel", "configuraciones"
+    })
     private Sensor sensor;
 
     // --- Campos de Detección ---

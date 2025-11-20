@@ -1,5 +1,6 @@
 package com.agromatik.cloud.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.*;
@@ -33,7 +34,7 @@ public class Huerta {
 
     private String descripcion;
 
-    // 🔹 Cambiado de Point a String
+    // Cambiado de Point a String
     @Column(name = "ubicacion_geografica", length = 255)
     private String ubicacionGeografica;
 
@@ -58,9 +59,9 @@ public class Huerta {
     @Column(name="altitud_metros", precision=8, scale = 2)
     private BigDecimal altitudMetros;
     // Relación con Usuario (muchas huertas pueden pertenecer a un usuario)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "huertas"}) //  'huertas' para evitar el ciclo
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="usuario_id", nullable=false)
+    @JsonIgnore
     private Usuario usuario;
 
     @CreationTimestamp

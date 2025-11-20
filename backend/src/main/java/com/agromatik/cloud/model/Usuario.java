@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -37,6 +38,7 @@ public class Usuario {
 
     @Column(name = "password_hash", nullable = false, length=255)
     @NotBlank(message = "La contraseña es obligatoria")
+    @JsonIgnore
     private String passwordHash;
 
     @Column(nullable = false, length = 100)

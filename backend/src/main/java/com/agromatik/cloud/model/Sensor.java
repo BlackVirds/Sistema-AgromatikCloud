@@ -63,7 +63,17 @@ public class Sensor {
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="huerta_id", nullable=false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    // Trae la huerta, pero OCULTA al usuario y datos pesados.
+    @JsonIgnoreProperties({
+            "hibernateLazyInitializer", "handler",
+            "usuario",
+            "descripcion",
+            "tipoSuelo",
+            "activa",
+            "altitudMetros",
+            "fechaCreacion",
+            "ubicacionGeografica"
+    })
     @NotNull(message = "La huerta es obligatoria para crear un sensor")
     private Huerta huerta;
 

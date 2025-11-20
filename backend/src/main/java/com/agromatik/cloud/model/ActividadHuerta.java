@@ -27,10 +27,25 @@ public class ActividadHuerta {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="huerta_id", nullable = false)
     @NotNull(message = "La huerta es obligatoria")
+    // Ignoramos todo lo pesado de la huerta
+    @JsonIgnoreProperties({
+            "hibernateLazyInitializer", "handler",
+            "usuario",              // Recursión
+            "descripcion", "ubicacionGeografica", "direccion",
+            "pais", "tamañoHectareas", "tipoSuelo", "altitudMetros",
+            "fechaCreacion", "activa"
+    })
     private Huerta huerta;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="cultivo_id")
+    // Ignoramos lo pesado del cultivo
+    @JsonIgnoreProperties({
+            "hibernateLazyInitializer", "handler",
+            "huerta",               // Recursión (ya tenemos la huerta arriba)
+            "notas", "fechaSiembra", "fechaCosechaEstimada",
+            "fechaCosechaReal", "densidadSiembra", "metodoRiego"
+    })
     private Cultivo cultivo;
 
     @Enumerated(EnumType.STRING)
@@ -51,6 +66,12 @@ public class ActividadHuerta {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_responsable")
+    // Ignoramos TODO lo que no sea identificación básica
+    @JsonIgnoreProperties({
+            "hibernateLazyInitializer", "handler",
+            "passwordHash", "huertas", "configuraciones", "suscriptionPlan",
+            "fechaRegistro", "ultimoLogin", "activo", "tipo",
+    })
     private Usuario usuarioResponsable;
 
     public enum TipoActividad {

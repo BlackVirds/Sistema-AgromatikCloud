@@ -26,7 +26,17 @@ public class LecturaSensor {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sensor_id", nullable = false)
     @NotNull(message = "El sensor es obligatorio")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "huerta", "usuario"})
+    @JsonIgnoreProperties({
+            "hibernateLazyInitializer", "handler",
+            "huerta",
+            "usuario",
+            "configuraciones",
+            "fechaInstalacion",
+            "fabricante",
+            "modelo",
+            "ultimoMantenimiento",
+            "uuid"
+    })
     private Sensor sensor;
 
     // Usamos BigDecimal para garantizar la precisión del valor numérico.

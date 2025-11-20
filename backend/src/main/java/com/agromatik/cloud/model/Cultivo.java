@@ -62,7 +62,19 @@ public class Cultivo {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "huerta_id", nullable = false)
     @NotNull(message = "La huerta es obligatoria para crear un cultivo")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "cultivos"})
+    // "Trae la huerta, PERO ignora estos campos pesados/cíclicos"
+    @JsonIgnoreProperties({
+            "hibernateLazyInitializer", "handler",
+            "usuario",
+            "cultivos",
+            "uuid",
+            "pais",
+            "tamañoHectareas",
+            "altitudMetros",
+            "fechaCreacion",
+            "tipoSuelo",
+            "ubicacionGeografica"//Recursión: No traer la lista de cultivos otra vez
+    })
     private Huerta huerta;
 
     public enum EstadoCultivo {
