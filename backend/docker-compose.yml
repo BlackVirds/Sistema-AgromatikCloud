@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # --- TU BACKEND (SPRING BOOT) ---
+  backend:
+    build: .
+    container_name: agromatik-backend
+    ports:
+      - "8080:8080" # Puerto local : Puerto del contenedor
+    environment:
+      # Configuración de Base de Datos (Conecta con el servicio 'db' de abajo)
+      - MYSQLHOST=db
+      - MYSQLPORT=3306
+      - MYSQLDATABASE=agromatik_db
+      - MYSQLUSER=root
+      - MYSQLPASSWORD=rootpassword
+
+      # Variables de Seguridad
+      - JWT_SECRET=9a8f7g6h5j4k3l2z1x0c9v8b7n6m5QWERTYUIOPASDFGHJKL
+      - APP_API_KEY=AgromatikSecureKeyForSensorsOnly
+
+    depends_on:
+      - db
+    networks:
+      - agromatik-net
+
+  # --- BASE DE DATOS (MySQL 8.0) ---
+  db:
+    image: mysql:8.0
+    container_name: agromatik-mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: agromatik_db
+    volumes:
+      - mysql_data:/var/lib/mysql # Esto guarda los datos aunque apagues el contenedor
+    networks:
+      - agromatik-net
+
+networks:
+  agromatik-net:
+    driver: bridge
+
+volumes:
+  mysql_data:
