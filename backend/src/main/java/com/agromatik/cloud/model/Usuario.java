@@ -1,6 +1,7 @@
 package com.agromatik.cloud.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -38,7 +39,7 @@ public class Usuario {
 
     @Column(name = "password_hash", nullable = false, length=255)
     @NotBlank(message = "La contraseña es obligatoria")
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String passwordHash;
 
     @Column(nullable = false, length = 100)

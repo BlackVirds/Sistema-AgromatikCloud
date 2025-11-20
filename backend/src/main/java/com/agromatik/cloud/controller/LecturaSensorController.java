@@ -21,6 +21,19 @@ public class LecturaSensorController {
 
     private final LecturaSensorService lecturaService;
 
+    /**
+     * Obtiene todas las lecturas del usuario (paginadas).
+     * URL: GET /api/lecturas?page=0&size=50
+     */
+    @GetMapping
+    public ResponseEntity<Page<LecturaSensor>> getAllLecturas(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+
+        Page<LecturaSensor> lecturas = lecturaService.getAll(PageRequest.of(page, size));
+        return ResponseEntity.ok(lecturas);
+    }
+
     // --- MÉTODOS DE ESCRITURA (POST) ---
 
     @PostMapping

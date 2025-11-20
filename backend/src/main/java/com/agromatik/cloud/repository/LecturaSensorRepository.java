@@ -26,6 +26,9 @@ public interface LecturaSensorRepository extends JpaRepository<LecturaSensor, Lo
     // 2. Obtener el historial paginado (necesario para el gráfico de tiempo)
     Page<LecturaSensor> findBySensorUuidOrderByTimestampDesc(String uuid, Pageable pageable);
 
+    // TODAS las lecturas de un usuario (Paginado)
+    Page<LecturaSensor> findAllBySensorHuertaUsuarioEmail(String email, Pageable pageable);
+
     // 3. Obtener lecturas en un rango de fecha (para análisis específico)
     List<LecturaSensor> findBySensorUuidAndTimestampBetween(String uuid, LocalDateTime inicio, LocalDateTime fin);
 

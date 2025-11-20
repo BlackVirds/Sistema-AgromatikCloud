@@ -21,6 +21,9 @@ services:
 
     depends_on:
       - db
+
+    restart: on-failure:5  # Reintentar hasta 5 veces si falla
+
     networks:
       - agromatik-net
 

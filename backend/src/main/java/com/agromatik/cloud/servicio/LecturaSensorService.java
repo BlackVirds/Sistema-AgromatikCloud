@@ -84,6 +84,22 @@ public class LecturaSensorService {
     // --- MÉTODOS DE CONSULTA DE HISTORIAL (Faltantes) ---
 
     /**
+     * Obtiene TODAS las lecturas (de todos los sensores).
+     * - Si es ADMIN: Ve todo.
+     * - Si es USUARIO: Ve solo lo suyo.
+     */
+    public Page<LecturaSensor> getAll(Pageable pageable) {
+        Authentication auth = getAuthentication();
+        if (esAdmin(auth)) {
+            return lecturaRepository.findAll(pageable);
+        } else {
+            String email = getEmailUsuario(auth);
+            // Usamos el método nuevo del repositorio
+            return lecturaRepository.findAllBySensorHuertaUsuarioEmail(email, pageable);
+        }
+    }
+
+    /**
      * Obtiene la ÚLTIMA lectura (Seguro)
      */
     public Optional<LecturaSensor> findLatestBySensorUuid(String uuid) {
