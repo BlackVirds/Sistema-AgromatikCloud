@@ -76,8 +76,21 @@ public class UsuarioService {
                 usuarioExistente.setNombre(usuarioNuevosDatos.getNombre());
                 usuarioExistente.setApellido(usuarioNuevosDatos.getApellido());
                 usuarioExistente.setTelefono(usuarioNuevosDatos.getTelefono());
-                usuarioExistente.setTipo(Usuario.TipoUsuario.AGRICULTOR);
-                usuarioExistente.setSuscriptionPlan(Usuario.PlanSuscripcion.BASICO); // (Forzamos el plan)
+                // --- LÓGICA DE SEGURIDAD PARA ROLES (REACTIVACIÓN) ---
+                // Si intenta ser ADMIN o no envía rol, lo forzamos a AGRICULTOR.
+                if (usuarioNuevosDatos.getTipo() == null || usuarioNuevosDatos.getTipo() == Usuario.TipoUsuario.ADMIN) {
+                    usuarioExistente.setTipo(Usuario.TipoUsuario.AGRICULTOR);
+                } else {
+                    // Si es EMPRESA o COOPERATIVA, respetamos la elección del usuario al reactivar.
+                    usuarioExistente.setTipo(usuarioNuevosDatos.getTipo());
+                }
+
+                // Lógica para el Plan (Opcional, misma regla: default BASICO si viene nulo)
+                if (usuarioNuevosDatos.getSuscriptionPlan() == null) {
+                    usuarioExistente.setSuscriptionPlan(Usuario.PlanSuscripcion.BASICO);
+                } else {
+                    usuarioExistente.setSuscriptionPlan(usuarioNuevosDatos.getSuscriptionPlan());
+                }
 
                 // Hashear la NUEVA contraseña
                 usuarioExistente.setPasswordHash(passwordEncoder.encode(usuarioNuevosDatos.getPasswordHash()));
@@ -93,9 +106,19 @@ public class UsuarioService {
         } else {
             // --- EL EMAIL NO EXISTE ---
             // Caso 3: Es un usuario completamente nuevo.
-            //CORRECCIÓN DE SEGURIDAD (Forzar rol Y plan por defecto)
-            usuarioNuevosDatos.setTipo(Usuario.TipoUsuario.AGRICULTOR);
-            usuarioNuevosDatos.setSuscriptionPlan(Usuario.PlanSuscripcion.BASICO);
+            // 1. LÓGICA DE ROLES (Condicional de Seguridad)
+            // Si el usuario no especificó rol, O si intentó ponerse "ADMIN"...
+            if (usuarioNuevosDatos.getTipo() == null || usuarioNuevosDatos.getTipo() == Usuario.TipoUsuario.ADMIN) {
+                // ... le asignamos AGRICULTOR por defecto.
+                usuarioNuevosDatos.setTipo(Usuario.TipoUsuario.AGRICULTOR);
+            }
+            // Si envió "EMPRESA" o "COOPERATIVA", el IF se salta y se respeta su elección.
+
+            // 2. PLAN DE SUSCRIPCIÓN
+            // (Opcional: puedes aplicar la misma lógica aquí si quieres permitir otros planes)
+            if (usuarioNuevosDatos.getSuscriptionPlan() == null) {
+                usuarioNuevosDatos.setSuscriptionPlan(Usuario.PlanSuscripcion.BASICO);
+            }
             // Hashear la contraseña
             usuarioNuevosDatos.setPasswordHash(passwordEncoder.encode(usuarioNuevosDatos.getPasswordHash()));
 
