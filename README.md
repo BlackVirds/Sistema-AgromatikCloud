@@ -453,26 +453,26 @@ A diferencia de los otros recursos, las actividades se identifican por **ID num�
 
 ## 👤 8. Gestión de Perfil (Usuario)
 
-Endpoints para que el usuario gestione su propia cuenta.
+Endpoints seguros para que el usuario gestione su propia cuenta sin necesidad de enviar su ID. El sistema identifica al usuario automáticamente a través del **Token JWT**.
 
 ### A. Obtener mis datos
+Recupera toda tu información personal (incluyendo plan, rol, etc.).
 
-  * **Método:** `GET`
-  * **Endpoint:** `/api/usuarios/uuid/{mi-uuid}` (O consultar `/api/usuarios` y filtrar por tu email)
+* **Método:** `GET`
+* **Endpoint:** `/api/usuarios/me`
+* **Header:** `Authorization: Bearer <TU_TOKEN>`
 
 ### B. Actualizar mi perfil
+Permite cambiar datos personales. **Nota:** No se permite cambiar el email, contraseña o rol por esta vía.
 
-Permite cambiar datos personales sin permisos de administrador.
-
-  * **Método:** `PUT`
-  * **Endpoint:** `/api/usuarios/me`
+* **Método:** `PUT`
+* **Endpoint:** `/api/usuarios/me`
 
 **JSON Body:**
-
 ```json
 {
   "nombre": "Juan Carlos",
-  "apellido": "Pérez", // [OPCIONAL]
+  "apellido": "Pérez",
   "telefono": "555-9999",
   "configuraciones": "{\"notificaciones\": false}"
 }
