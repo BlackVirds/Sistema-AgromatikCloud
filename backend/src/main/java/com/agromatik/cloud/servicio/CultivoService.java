@@ -90,7 +90,7 @@ public class CultivoService {
      */
     public Optional<Cultivo> updateByUuid(String uuid, Cultivo updated) {
 
-        // Llama al GeyByUuid SEGURO (que ya tienes en tu clase).
+        // Llama al GeyByUuid SEGURO
         // Si no es Admin y el cultivo no le pertenece, 'getByUuid' devuelve Optional.empty()
         // y el '.map()' no se ejecuta.
         return this.getByUuid(uuid).map(existing -> {

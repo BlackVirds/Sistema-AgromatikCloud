@@ -67,6 +67,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() // Específico
 
                         // Endpoints de Usuario (Self-Service)
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios/me").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/usuarios/me").authenticated() // Específico
                         .requestMatchers(HttpMethod.PUT, "/api/usuarios/me").authenticated() // Específico
 

@@ -31,7 +31,19 @@ public class UsuarioController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+    /**
+     * NUEVO: Obtener mis propios datos (GET /me)
+     */
+    @GetMapping("/me")
+    public ResponseEntity<Usuario> getMiPerfil() {
+        // Obtenemos el email directamente del contexto de seguridad
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String emailUsuario = auth.getName();
 
+        return usuarioService.getByEmail(emailUsuario)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
     @PostMapping
     public Usuario createUsuario(@RequestBody Usuario usuario){
         return usuarioService.save(usuario);

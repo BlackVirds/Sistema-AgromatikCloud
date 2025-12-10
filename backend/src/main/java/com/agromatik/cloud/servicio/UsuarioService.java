@@ -26,6 +26,11 @@ public class UsuarioService {
         return usuarioRepository.findByUuid(uuid);
     }
 
+    // Necesario para el endpoint GET /me
+    public Optional<Usuario> getByEmail(String email) {
+        return usuarioRepository.findByEmail(email);
+    }
+
     public Optional<Usuario> update(String uuid, Usuario datosActualizados) {
         return usuarioRepository.findByUuid(uuid).map(usuarioExistente -> {
 
