@@ -165,7 +165,7 @@ Da de alta un dispositivo físico en la plataforma.
 {
   "huerta": { "id": 1 },             // [OBLIGATORIO] Dónde está instalado
   "nombre": "Sensor-Humedad-01",     // [OBLIGATORIO] Debe ser único en todo el sistema (ID Físico)
-  "tipoSensor": "HUMEDAD_SUELO",     // [OBLIGATORIO] HUMEDAD_SUELO, HUMEDAD_AMBIENTAL, PH, LUZ, VIENTO, LLUVIA
+  "tipoSensor": "HUMEDAD_SUELO",     // [OBLIGATORIO] TEMPERATURA, HUMEDAD_SUELO, HUMEDAD_AMBIENTAL, PH, LUZ, VIENTO, LLUVIA
   "modelo": "ESP32-S3",              // [OPCIONAL]
   "fabricante": "AgroTech",          // [OPCIONAL]
   "fechaInstalacion": "2025-01-10",  // [OPCIONAL]
