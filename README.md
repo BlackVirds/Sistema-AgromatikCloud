@@ -281,7 +281,7 @@ Agendas una tarea (riego, poda, fertilización).
 ```json
 {
   "huerta": { "id": 1 },               // [OBLIGATORIO]
-  "tipoActividad": "RIEGO",            // [OBLIGATORIO] RIEGO, PODA, FERTILIZACION, COSECHA
+  "tipoActividad": "RIEGO",            // [OBLIGATORIO] RIEGO, FERTILIZACION, PODA, APLICACION_PESTICIDA, COSECHA, MUESTREO
   "cultivo": { "id": 1 },              // [OPCIONAL] Si afecta a un cultivo específico
   "usuarioResponsable": { "id": 2 },   // [OPCIONAL] A quién se asigna
   "descripcion": "Riego matutino",     // [OPCIONAL]
