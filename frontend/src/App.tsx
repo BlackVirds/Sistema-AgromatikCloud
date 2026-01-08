@@ -1,16 +1,54 @@
-import { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Login from "./components/Login";
+import Register from "./pages/Register";
+import RegisterHuerta from "./pages/RegisterHuerta";
+import HuertaDashboard from "./pages/HuertaDashboard";
+import Dashboard from "./pages/Dashboard";
 
-import AlertsDashboard from "./pages/alertsDashboard";
-import "./App.css";
-
-function App() {
-  const [count, setCount] = useState(0);
+const App = () => {
+  const isAuth = localStorage.getItem("auth") === "true";
+  const huertas = JSON.parse(sessionStorage.getItem("huertas") || "[]");
 
   return (
-    <div style={{ fontFamily: "Arial, sans-serif" }}>
-      <AlertsDashboard /> {/* 👈 Renderizar el Dashboard */}
-    </div>
+    <Routes>
+      {/* LOGIN (no redirige) */}
+      <Route path="/login" element={<Login />} />
+
+      {/* REGISTRO USUARIO */}
+      <Route path="/register" element={<Register />} />
+
+      {/* DASHBOARD */}
+      <Route
+        path="/dashboard"
+        element={
+          isAuth ? (
+            huertas.length === 0 ? (
+              <Navigate to="/register-huerta" />
+            ) : (
+              <Dashboard />
+            )
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+
+      {/* REGISTRO HUERTA */}
+      <Route
+        path="/register-huerta"
+        element={isAuth ? <RegisterHuerta /> : <Navigate to="/login" />}
+      />
+
+      {/* HUERTA DASHBOARD */}
+      <Route
+        path="/huerta-dashboard"
+        element={isAuth ? <HuertaDashboard /> : <Navigate to="/login" />}
+      />
+
+      {/* CUALQUIER OTRA RUTA */}
+      <Route path="*" element={<Navigate to="/login" />} />
+    </Routes>
   );
-}
+};
 
 export default App;
