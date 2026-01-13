@@ -22,16 +22,13 @@ const App = () => {
         path="/dashboard"
         element={
           isAuth ? (
-            huertas.length === 0 ? (
-              <Navigate to="/register-huerta" />
-            ) : (
-              <Dashboard />
-            )
+            <Dashboard />
           ) : (
             <Navigate to="/login" />
           )
         }
       />
+
 
       {/* REGISTRO HUERTA */}
       <Route

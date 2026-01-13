@@ -1,0 +1,195 @@
+/* ===== RESET BÁSICO ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+.registerHuerta-container {
+  min-height: 100vh;
+  width: 100%;
+
+  background-image: url("../assets/RegisterHuerta.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ===== TÍTULO ===== */
+.registerHuerta-container h2 {
+  margin-bottom: 20px;
+  color: #000;
+  text-align: center;
+}
+
+/* ===== FORMULARIO ===== */
+.registerHuerta-form {
+  width: 420px;
+  padding: 32px;
+
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== INPUTS, SELECT, TEXTAREA ===== */
+.registerHuerta-form input,
+.registerHuerta-form select,
+.registerHuerta-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 14px;
+
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+
+  outline: none;
+  color: #000;
+}
+
+/* Placeholder */
+.registerHuerta-form input::placeholder,
+.registerHuerta-form textarea::placeholder {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Textarea */
+.registerHuerta-form textarea {
+  resize: none;
+  min-height: 80px;
+}
+
+/* ===== BOTONES CONTENEDOR ===== */
+.registerHuerta-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* ===== BOTÓN GUARDAR ===== */
+.registerHuerta-saveBtn {
+  flex: 1;                 /* 🔥 mismo ancho */
+  padding: 12px;           /* 🔥 mismo tamaño */
+  font-size: 1rem;
+  font-weight: 600;
+
+  background-color: #4caf50;
+  color: white;
+
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.registerHuerta-saveBtn:hover {
+  background-color: #43a047;
+  transform: translateY(-1px);
+}
+
+/* ===== BOTÓN CANCELAR (MISMO TAMAÑO) ===== */
+.registerHuerta-cancelBtn {
+  flex: 1;                 /* 🔥 mismo ancho */
+  padding: 12px;           /* 🔥 mismo tamaño */
+  font-size: 1rem;
+  font-weight: 600;
+
+  background-color: #dc2626;
+  color: white;
+
+  border: none;
+  border-radius: 8px;      /* 🔥 igual que guardar */
+  cursor: pointer;
+
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.registerHuerta-cancelBtn:hover {
+  background-color: #b91c1c;
+  transform: translateY(-1px);
+}
+
+/* ===== MODAL ===== */
+.registerHuerta-modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.registerHuerta-modal {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 280px;
+  text-align: center;
+}
+
+/* ===== TEXTO MODAL ===== */
+.registerHuerta-modalError {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+.registerHuerta-modalSuccess {
+  color: #16a34a;
+  font-weight: bold;
+}
+
+/* ===== BOTÓN MODAL ERROR ===== */
+.registerHuerta-modalButtonError {
+  margin-top: 15px;
+  padding: 8px 16px;
+
+  background-color: #f87171;
+  color: white;
+
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.registerHuerta-modalButtonError:hover {
+  background-color: #ef4444;
+}
+
+/* ===== BOTÓN MODAL ÉXITO ===== */
+.registerHuerta-modalButtonSuccess {
+  margin-top: 15px;
+  padding: 8px 16px;
+
+  background-color: #22c55e;
+  color: white;
+
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.registerHuerta-modalButtonSuccess:hover {
+  background-color: #16a34a;
+}

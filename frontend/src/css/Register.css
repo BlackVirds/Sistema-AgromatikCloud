@@ -1,133 +1,185 @@
-/* RESET GLOBAL */
+/* ===== RESET BÁSICO ===== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html,
-body,
-#root {
-  width: 100%;
-  height: 100%;
-}
-
-/* Fondo a pantalla completa */
-.container-Register {
-  height: 100%;
+/* ===== CONTENEDOR PRINCIPAL ===== */
+.dashboard {
+  min-height: 100vh;
   width: 100%;
 
-  background-image: url("../assets/Register.png");
+  background-image: url("../assets/Dashboard.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 
+  padding: 2rem;
+
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
 }
 
-/* Formulario traslúcido */
-.form-Register {
-  width: 380px;
-  padding: 32px;
+/* ===== HEADER ===== */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.5rem;
 
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
 }
 
-/* Título */
-.form-Register h2 {
-  margin-bottom: 20px;
+.dashboard-header h1 {
   color: #000;
-  text-align: center;
 }
 
-/* Inputs transparentes */
-.input-Register {
-  width: 100%;
+/* ===== BOTONES GRID ===== */
+.grid-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.grid-controls button {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+
+  background: rgba(255, 255, 255, 0.4);
+  font-weight: 600;
+}
+
+.grid-controls button.active {
+  background: #4caf50;
+  color: white;
+}
+
+/* ===== BUSCADOR ===== */
+.dashboard-search {
   max-width: 300px;
   padding: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 1.5rem;
 
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 
   border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 8px;
+  border-radius: 10px;
 
   outline: none;
   color: #000;
 }
 
-.input-Register::placeholder {
+.dashboard-search::placeholder {
   color: rgba(0, 0, 0, 0.6);
 }
 
-/* Botón */
-.button-Register {
-  width: 100%;
-  max-width: 300px;
-  padding: 12px;
-  margin-top: 10px;
+/* ===== HUERTA TEMPORAL ===== */
+.huerta-temp {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.5rem;
 
-  background-color: #2196f3;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border-radius: 16px;
+  border: 2px dashed orange;
+}
+
+.huerta-temp button {
+  margin-top: 0.5rem;
+  padding: 8px 14px;
+
+  background: orange;
+  border: none;
+  border-radius: 8px;
   color: white;
-  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ===== MENSAJE SIN HUERTAS ===== */
+.no-huertas {
+  color: #333;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+/* ===== GRID ===== */
+.huertas-grid {
+  display: grid;
+  gap: 1.2rem;
+}
+
+/* Columnas */
+.huertas-grid.cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.huertas-grid.cols-5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.huertas-grid.cols-7 {
+  grid-template-columns: repeat(7, 1fr);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .huertas-grid.cols-5,
+  .huertas-grid.cols-7 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .huertas-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+/* ===== CARD ===== */
+.huerta-card {
+  padding: 1rem;
+
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.huerta-card h3 {
+  margin-bottom: 0.8rem;
+  color: #000;
+}
+
+/* BOTÓN */
+.huerta-card button {
+  padding: 10px;
+  background: #2196f3;
+  color: white;
 
   border: none;
   border-radius: 8px;
   cursor: pointer;
 }
 
-.button-Register:hover {
-  background-color: #1976d2;
-}
-
-/* ===== MODAL ===== */
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal {
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-  width: 300px;
-  text-align: center;
-}
-
-.modal-error {
-  color: #e53935;
-  margin-bottom: 16px;
-}
-
-.modal-success {
-  color: #43a047;
-  margin-bottom: 16px;
-}
-
-.modal-button {
-  padding: 10px 20px;
-  border: none;
-  background: #2196f3;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
+.huerta-card button:hover {
+  background: #1976d2;
 }

@@ -1,0 +1,264 @@
+/* ===== RESET GLOBAL ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== DASHBOARD CONTENEDOR ===== */
+.dashboard {
+  min-height: 100vh;
+  width: 100%;
+  padding: 2rem;
+
+  background-image: url("../assets/Dashboard.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ===== HEADER ===== */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+/* ===== ACCIONES DASHBOARD ===== */
+.dashboard-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* BOTÓN NUEVA HUERTA */
+.add-huerta-btn {
+  padding: 12px 18px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+
+  background: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.add-huerta-btn:hover {
+  background: #43a047;
+  transform: translateY(-1px);
+}
+
+/* ===== BOTONES GRID ===== */
+.grid-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.grid-controls button {
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.3);
+  cursor: pointer;
+
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(6px);
+
+  font-weight: 600;
+}
+
+.grid-controls button.active {
+  background: #4caf50;
+  color: white;
+  border-color: #4caf50;
+}
+
+/* ===== BUSCADOR ===== */
+.dashboard-search-controls {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-search-controls input,
+.dashboard-search-controls select {
+  border-radius: 16px;
+  padding: 14px 20px;
+  font-size: 16px;
+  min-height: 52px;
+
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(8px);
+
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  color: #000;
+  outline: none;
+}
+
+/* Placeholder */
+.dashboard-search-controls input::placeholder {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Focus */
+.dashboard-search-controls input:focus,
+.dashboard-search-controls select:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+}
+
+/* ===== HUERTA TEMPORAL ===== */
+.huerta-temp {
+  border: 2px dashed orange;
+  padding: 1rem;
+  border-radius: 14px;
+  margin-bottom: 1.5rem;
+
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+.huerta-temp button {
+  margin-top: 0.5rem;
+  padding: 10px 14px;
+  background: orange;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+}
+
+/* ===== TEXTO HUERTA TEMPORAL ===== */
+.huerta-temp {
+  color: #444; /* gris oscuro */
+}
+
+.huerta-temp h3 {
+  color: #333;
+}
+
+.huerta-temp p {
+  color: #444;
+}
+
+.huerta-temp p strong {
+  color: #333;
+}
+
+
+/* ===== MENSAJE SIN HUERTAS ===== */
+.no-huertas {
+  font-style: italic;
+  color: #333;
+}
+
+/* ===== GRID ===== */
+.huertas-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+/* Columnas */
+.huertas-grid.cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.huertas-grid.cols-5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.huertas-grid.cols-7 {
+  grid-template-columns: repeat(7, 1fr);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .huertas-grid.cols-5,
+  .huertas-grid.cols-7 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .huertas-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+/* ===== CARD ===== */
+.huerta-card {
+  padding: 1.2rem;
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(10px);
+
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.huerta-card h3 {
+  margin-bottom: 0.5rem;
+}
+
+.huerta-card p {
+  font-size: 14px;
+  margin: 0.2rem 0;
+}
+
+.huerta-card button {
+  margin-top: 0.8rem;
+  padding: 10px;
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.huerta-card button:hover {
+  background: #1976d2;
+}
+
+/* ===== TEXTO DATOS HUERTA ===== */
+.huerta-card p {
+  color: #444;          /* gris oscuro */
+}
+
+/* Opcional: etiquetas en negrita un poco más oscuras */
+.huerta-card p strong {
+  color: #333;
+}
+
+/* ===== BOTÓN SALIR ===== */
+.logout-btn {
+  padding: 12px 18px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+
+  background: rgba(244, 67, 54, 0.9); /* rojo elegante */
+  color: white;
+  border: none;
+  cursor: pointer;
+
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.logout-btn:hover {
+  background: #e53935;
+  transform: translateY(-1px);
+}

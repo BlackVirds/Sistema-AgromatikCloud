@@ -1,0 +1,107 @@
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== CONTENEDOR ===== */
+.huertaDashboard-container {
+  min-height: 100vh;
+  width: 100%;
+
+  background-image: url("../assets/HuertaDashboard.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ===== HEADER ===== */
+.huertaDashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 1.5rem;
+
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.huertaDashboard-header h1 {
+  color: #000;
+}
+
+/* ===== ACTIONS ===== */
+.huertaDashboard-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.back-btn {
+  padding: 10px 16px;
+  background: #2563eb;
+  color: white;
+
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.back-btn:hover {
+  background: #1d4ed8;
+  transform: scale(1.05);
+}
+
+.logout-btn {
+  padding: 10px 16px;
+  background: #dc2626;
+  color: white;
+
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.logout-btn:hover {
+  background: #b91c1c;
+  transform: scale(1.05);
+}
+
+/* ===== CARD INFO ===== */
+.huertaDashboard-card {
+  max-width: 600px;
+
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 2rem;
+
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.huertaDashboard-card p {
+  margin-bottom: 0.75rem;
+  color: #000;
+  font-size: 1rem;
+}

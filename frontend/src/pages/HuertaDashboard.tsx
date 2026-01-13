@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Huerta } from "../types/Huerta";
+import "../css/HuertaDashboard.css";
 
 const HuertaDashboard = () => {
   const navigate = useNavigate();
@@ -9,7 +10,6 @@ const HuertaDashboard = () => {
     sessionStorage.getItem("huertaActiva") || "null"
   );
 
-  // ✅ Redirección segura
   useEffect(() => {
     if (!huerta) {
       navigate("/dashboard");
@@ -17,7 +17,6 @@ const HuertaDashboard = () => {
   }, [huerta, navigate]);
 
   const logout = () => {
-    localStorage.clear();
     sessionStorage.clear();
     navigate("/login");
   };
@@ -25,27 +24,47 @@ const HuertaDashboard = () => {
   if (!huerta) return null;
 
   return (
-    <div>
-      <div style={{ display: "flex", gap: "1rem" }}>
-        <button onClick={() => navigate("/dashboard")}>
-          ← Volver al Dashboard
-        </button>
+    <div className="huertaDashboard-container">
+      {/* HEADER */}
+      <div className="huertaDashboard-header">
+        <h1>{huerta.nombre}</h1>
 
-        <button onClick={logout} style={{ background: "#f87171", color: "white" }}>
-          Cerrar sesión
-        </button>
+        <div className="huertaDashboard-actions">
+          <button
+            className="back-btn"
+            onClick={() => navigate("/dashboard")}
+          >
+            ← Volver
+          </button>
+
+          <button
+            className="logout-btn"
+            onClick={logout}
+          >
+            Cerrar sesión
+          </button>
+        </div>
       </div>
 
-      <h2>{huerta.nombre}</h2>
+      {/* CARD INFO */}
+      <div className="huertaDashboard-card">
+        {Object.entries(huerta).map(([key, value]) => {
+          if (!value) return null;
 
-      {huerta.tamañoHectareas && <p>Tamaño: {huerta.tamañoHectareas} ha</p>}
-      {huerta.direccion && <p>Dirección: {huerta.direccion}</p>}
-      {huerta.municipio && <p>Municipio: {huerta.municipio}</p>}
-      {huerta.estado && <p>Estado: {huerta.estado}</p>}
-      {huerta.pais && <p>País: {huerta.pais}</p>}
+          // 🔤 Formatear nombre del campo
+          const label = key
+            .replace(/([A-Z])/g, " $1")
+            .replace(/^./, (l) => l.toUpperCase());
+
+          return (
+            <p key={key}>
+              <strong>{label}:</strong> {String(value)}
+            </p>
+          );
+        })}
+      </div>
     </div>
   );
 };
 
 export default HuertaDashboard;
-
